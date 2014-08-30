@@ -14,7 +14,7 @@ Pour produire une partition :
 =end
 
 # Path au fichier source User contenant la définition de la partition
-SCORE_PATH = "essai"
+SCORE_PATH = "./tests/essai"
 
 
 require_relative 'lib/required'
