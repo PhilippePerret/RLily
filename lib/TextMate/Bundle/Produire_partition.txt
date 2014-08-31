@@ -1,0 +1,14 @@
+NOM : Produire partition
+
+SCOPE : source.ruby
+SHORTCUT : Command + Option + Ctrl + S (comme Score)
+
+CODE
+
+#!/usr/bin/env ruby -wU
+
+path = ENV['TM_FILEPATH']
+
+`rlily "#{path}"`
+
+/CODE

@@ -1,23 +1,30 @@
+#!/usr/bin/ruby
+# encoding: UTF-8
+
 =begin
 
   === main ===
 
 Pour le moment, ne traite que les partitions pour le piano
 
-Pour produire une partition :
----------------------------
-
-  1. Créer un fichier .rb contenant la définition de la partition
-  2. Définir la valeur SCORE_PATH ci-dessous avec la path de ce fichier
-  3. Runner ce fichier (Pomme + R)
+Pour produire une partition : Lire le manuel.
 
 =end
 
 # Path au fichier source User contenant la définition de la partition
-SCORE_PATH = "./tests/essai"
+# Sauf si le script est appelé via la console ou l'application Platypus.
+# TODO : ÇA NE FONCTIONNE PAS POUR LE MOMENT
+unless defined?(ARGV) && ARGV[0] != nil
 
+  # === PATH DU FICHIER SOURCE ===
+
+  SCORE_PATH = "./tests/bad"
+else
+  SCORE_PATH = ARGV[0]
+end
 
 require_relative 'lib/required'
+
 begin
   SCORE.source= SCORE_PATH
   SCORE.build

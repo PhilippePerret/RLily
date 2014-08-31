@@ -12,6 +12,9 @@ class Score
   # Le code lilypond final produit
   attr_reader :code_final
   
+  # Les systèmes créés (en général un seul)
+  attr_accessor :staves
+  
   # Données à définir à l'aide de SCORE::<donnée>
   attr_accessor :titre
   attr_accessor :compositeur
@@ -24,16 +27,24 @@ class Score
     load_source
     compose
     save_lilypond_file
+    
     # Production du PDF
-    `lilypond "#{lilypond_filepath}"`
-    # Ouverture du fichier PDF
-    `open "#{pdf_filepath}"`
-    # Affichage du code final
-    # puts @code_final
+    begin
+      `echo "#{App::su_password}" | sudo -S lilypond "#{lilypond_filepath}"`
+    rescue Exception => e
+      puts "Le construction du PDF a échoué."
+    end
+    
+
     if File.exists?(pdf_filepath)
       puts "\n\nLA PARTITION A ÉTÉ PRODUITE AVEC SUCCÈS\n#{pdf_filepath}"
+      # Ouverture du fichier PDF
+      `open "#{pdf_filepath}"`
     else
       puts "\n\nIMPOSSIBLE DE PRODUIRE LE PDF DE LA PARTITION…"
+      puts "Tape Pomme + R pour lancer la création de la partition à partir du fichier .ly produit."
+      # Ouverture du fichier .ly pour le créer
+      `mate "#{lilypond_filepath}"`
     end
   end
   
@@ -59,6 +70,20 @@ class Score
   
   # Construction des portées
   def staves
+    # On met toujours le système courant en mémoire
+    memorize_stave
+    # On renvoie tous les systèmes
+    @staves.join("\n\n")
+  end
+  
+  # Mémorisation du système courant
+  def memorize_stave
+    @staves ||= []
+    @staves << stave
+  end
+  
+  # Retourne le code pour le système courant
+  def stave
     <<-LP
 \\new PianoStaff <<
   #{MD.build}
