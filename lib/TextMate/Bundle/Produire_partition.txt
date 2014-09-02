@@ -9,6 +9,6 @@ CODE
 
 path = ENV['TM_FILEPATH']
 
-`rlily "#{path}"`
+puts `rlily "#{path}"`
 
 /CODE

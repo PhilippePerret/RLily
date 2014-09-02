@@ -26,10 +26,12 @@ end
 require_relative 'lib/required'
 
 begin
+  # raise "Pour tenter de voir la sortie"
   SCORE.source= SCORE_PATH
   SCORE.build
 rescue Exception => e
-  puts "ERREUR : #{e.message}"
-  puts e.backtrace.join("\n")
+  dbg "ERREUR : #{e.message}", :error
+  dbg e.backtrace.join("\n"), :error
+  App::show_debug
 end
 

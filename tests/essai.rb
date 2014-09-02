@@ -1,8 +1,13 @@
 # Définition de la partition
 
-SCORE::titre = "Extension Hanon - Exercice 61"
+SCORE::titre        = "Extension Hanon - Exercice 61"
 SCORE::compositeur = "Phil Perret"
+SCORE::opus        = "17"
+SCORE::instrument   = "Piano"
 
 
-MD << "c16-1 (d-2 e-3 d-2 e-3 d-2 f-4 g-5)"
-MG << "c16-1 (d-4 e-3 d-4 e-3 d-4 f-2 g-1)"
+MD << "c d e"
+MD << chord("c e g")
+
+MG << "c d e"
+MG << chord("c e g")

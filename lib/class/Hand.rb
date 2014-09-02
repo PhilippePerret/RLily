@@ -28,18 +28,40 @@ class Hand
   def build
     <<-STAFF
 \\new Staff {
+  #{key_signature}
   \\clef #{clef}
   \\relative #{relative} {
     \\time #{SCORE::metrique || '4/4'}
     \\override Fingering.direction = #{fingering_direction}
-    #{notes.join(' ')}
+    #{notes.join("\n")}
   }
 }
     STAFF
   end
   
-  # Écrit la main dans le fichier
-  def write
-    puts notes.inspect
-  end  
+  ARMURES = {
+    "C#" => "cis \\major", "C#m" => "cis \\minor",
+    "Db" => "des \\major", "Dbm" => "des \\minor",
+    "D" => "d \\major", "Dm" => "d \\minor",
+    "D#" => "dis \\major", "D#m" => "dis \\minor",
+    "Eb" => "ees \\major", "Ebm" => "ees \\minor",
+    "E" => "e \\major", "Em" => "e \\minor",
+    "F" => "f \\major", "Fm" => "f \\minor",
+    "F#" => "fis \\major", "F#m" => "fis \\minor",
+    "Gb" => "ges \\major", "Gbm" => "ges \\minor",
+    "G" => "g \\major", "Gm" => "g \\minor",
+    "G#" => "gis \\major", "G#m" => "gis \\minor",
+    "Ab" => "aes \\major", "Abm" => "aes \\minor",
+    "A" => "a \\major", "Am" => "a \\minor",
+    "Bb" => "bes \\major", "Bbm" => "bes \\minor",
+    "B" => "b \\major", "Bm" => "b \\minor"
+  }
+  def key_signature
+    return "" if SCORE::armure.nil?
+    if ARMURES.has_key?(SCORE::armure)
+      SCORE::armure = ARMURES[SCORE::armure]
+    end
+    "\\key #{SCORE::armure}"
+  end
+  
 end

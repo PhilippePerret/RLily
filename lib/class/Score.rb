@@ -18,8 +18,47 @@ class Score
   # Données à définir à l'aide de SCORE::<donnée>
   attr_accessor :titre
   attr_accessor :compositeur
+  attr_accessor :piece
+  attr_accessor :instrument
+  attr_accessor :opus
   attr_accessor :metrique
   attr_accessor :armure
+  attr_accessor :tempo
+  
+  # Taille de la partition (20 pour normal)
+  attr_accessor :taille
+  
+  # Distance de la marge top au titre
+  attr_accessor :top_spacing
+  
+#   <<-LP
+# top-markup-spacing = #'(
+#   (padding . 1)
+#   (basic-distance . 40)
+#   (minimum-distance . 40)
+#   (stretchability . 0) % pour empêcher l'étirement automatique
+# )
+#   LP
+  
+  OPTIONS = {
+    # Affiche les dimensions sur la partition
+    :display_spacing  => {:command => "annotate-spacing", :value => false},
+    # Affiche le pied de page
+    :display_footer   => {:command => "make-footer", :value => false},
+    # Slash ("//") entre les systèmes
+    :slash_between_systemes => {:command => "system-separator-markup = \\slashSeparator", :value => false}
+  }
+  
+  # Retourne ou définit l'option +key+
+  def option key, value = nil
+    if key.class == Hash
+      value = key.values.first
+      key   = key.keys.first
+    end
+    raise "Clé #{key} inconnue des options du score" unless OPTIONS.has_key? key
+    OPTIONS[key][:value] = valeur unless value === nil
+    return OPTIONS[key][:value]
+  end
   
   # Construction de la partition
   def build
@@ -30,22 +69,26 @@ class Score
     
     # Production du PDF
     begin
-      `echo "#{App::su_password}" | sudo -S lilypond "#{lilypond_filepath}"`
+      cmd = "cd \"#{folder}\";echo \"#{App::su_password}\" | sudo -S lilypond \"#{lilypond_filepath}\" 2>&1"
+      dbg "Commande lilypond : #{cmd}", :notice
+      `#{cmd}`
     rescue Exception => e
-      puts "Le construction du PDF a échoué."
+      dbg "Le construction du PDF a échoué.", :error
     end
     
 
     if File.exists?(pdf_filepath)
-      puts "\n\nLA PARTITION A ÉTÉ PRODUITE AVEC SUCCÈS\n#{pdf_filepath}"
+      dbg "\n\nLA PARTITION A ÉTÉ PRODUITE AVEC SUCCÈS\n#{pdf_filepath}", :notice
       # Ouverture du fichier PDF
       `open "#{pdf_filepath}"`
     else
-      puts "\n\nIMPOSSIBLE DE PRODUIRE LE PDF DE LA PARTITION…"
-      puts "Tape Pomme + R pour lancer la création de la partition à partir du fichier .ly produit."
+      dbg "\n\nIMPOSSIBLE DE PRODUIRE LE PDF DE LA PARTITION…", :error
+      dbg "Tape Pomme + R pour lancer la création de la partition à partir du fichier .ly produit."
       # Ouverture du fichier .ly pour le créer
       `mate "#{lilypond_filepath}"`
+      App::show_debug
     end
+        
   end
   
   
@@ -57,10 +100,35 @@ class Score
   # Composition du code final
   def compose
     @code_final = []
+    @code_final << definitions_preliminaires
+    @code_final << paper_definition
     @code_final << lp_header
     @code_final << header
-    @code_final << staves
+    @code_final << bloc_score
     @code_final = @code_final.join("\n")
+  end
+  
+  def definitions_preliminaires
+    mark_score_size
+  end
+  def paper_definition
+    liste_options = OPTIONS.collect do |k, d|
+      "#{d[:command]} = ###{d[:value] ? 't' : 'f'}"
+    end.join("\n")    
+    <<-LP
+\\paper{
+  #{liste_options}
+}
+    LP
+  end
+  def bloc_score
+    <<-LP
+\\score{
+  #{staves}
+  \\layout{
+  }
+}
+    LP
   end
   
   # On sauve le fichier Lilypond produit
@@ -109,12 +177,28 @@ class Score
 \\header {
   title = "#{titre || ''}"
   composer = "#{compositeur || ''}"
+  #{mark_opus}
+  #{mark_piece}
+  #{mark_instrument}
 }
 
     HEADER
   end
   
+  def mark_opus;        mark_property 'opus', 'Op. '; end
+  def mark_piece;       mark_property 'piece';        end
+  def mark_instrument;  mark_property 'instrument';   end
+  def mark_property prop, avant = ""
+    val = self.instance_variable_get("@#{prop}")
+    return "" if val.nil?
+    "#{prop} = \"#{avant}#{val}\""
+  end
   
+  #
+  def mark_score_size
+    return "" if taille.nil?
+    "#(set-global-staff-size #{taille})\n"
+  end
   # Supprime les fichiers .ly et .pdf précédents s'ils avaient été
   # créés
   def erase_old_files
