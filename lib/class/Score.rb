@@ -3,6 +3,31 @@
 Class pour produire la partition
 
   SCORE est une constante instance de la classe
+
+Code pour régler l'espacement entre les systèmes :
+
+system-system-spacing = #'(
+	(basic-distance   . #{system_spacing})
+  (minimum-distance . #{system_spacing_min})
+	(padding          . #{system_spacing_pad})
+  (stretchability   . 10)
+) 
+ragged-bottom = ##t % Si False (##f), les portées se répartissent sur la feuille
+ragged-bottom-last = ##t
+#  où #{system_spacing} doit être un nombre (p.e. 10)
+
+Code pour régler la distance entre le titre et le premier système
+
+markup-system-spacing = #'(
+	(basic-distance   . 20) 
+  (minimum-distance . #{system_spacing_min})
+	(padding . 0)
+	(stretchability . 0)
+
+) 
+
+
+
 =end
 class Score
   
@@ -17,6 +42,7 @@ class Score
   
   # Données à définir à l'aide de SCORE::<donnée>
   attr_accessor :titre
+  attr_accessor :sous_titre
   attr_accessor :compositeur
   attr_accessor :piece
   attr_accessor :instrument
@@ -24,6 +50,10 @@ class Score
   attr_accessor :metrique
   attr_accessor :armure
   attr_accessor :tempo
+  # Espaces
+  attr_accessor :espace_titre_systemes  # entre le titre et le 1er système
+  attr_accessor :espace_entre_systemes  # entre les systèmes
+  
   
   # Taille de la partition (20 pour normal)
   attr_accessor :taille
@@ -40,13 +70,19 @@ class Score
 # )
 #   LP
   
+  # Options True ou False
   OPTIONS = {
     # Affiche les dimensions sur la partition
     :display_spacing  => {:command => "annotate-spacing", :value => false},
     # Affiche le pied de page
-    :display_footer   => {:command => "make-footer", :value => false},
-    # Slash ("//") entre les systèmes
-    :slash_between_systemes => {:command => "system-separator-markup = \\slashSeparator", :value => false}
+    :display_footer   => {:command => "make-footer", :value => false}
+  }
+  # Options à autres valeurs
+  OTHER_OPTIONS = {
+    :top_margin     => {:command => "top-margin", :value => "0.8\\in"},
+    :bottom_margin  => {:command => "bottom-margin", :value => "0.8\\in"},
+    # Slash ("//") entre les systèmes : \\slashSeparator
+    :slash_between_systemes => {:command => "system-separator-markup", :value => nil}
   }
   
   # Retourne ou définit l'option +key+
@@ -55,9 +91,15 @@ class Score
       value = key.values.first
       key   = key.keys.first
     end
-    raise "Clé #{key} inconnue des options du score" unless OPTIONS.has_key? key
-    OPTIONS[key][:value] = valeur unless value === nil
-    return OPTIONS[key][:value]
+    if OPTIONS.has_key? key
+      OPTIONS[key][:value] = valeur unless value === nil
+      return OPTIONS[key][:value]
+    elsif OTHER_OPTIONS.has_key? key
+      OTHER_OPTIONS[key][:value] = valeur
+      return OTHER_OPTIONS[key][:value]
+    else
+      raise "Clé #{key} inconnue des options du score"
+    end
   end
   
   # Construction de la partition
@@ -111,16 +153,6 @@ class Score
   def definitions_preliminaires
     mark_score_size
   end
-  def paper_definition
-    liste_options = OPTIONS.collect do |k, d|
-      "#{d[:command]} = ###{d[:value] ? 't' : 'f'}"
-    end.join("\n")    
-    <<-LP
-\\paper{
-  #{liste_options}
-}
-    LP
-  end
   def bloc_score
     <<-LP
 \\score{
@@ -153,11 +185,23 @@ class Score
   # Retourne le code pour le système courant
   def stave
     <<-LP
-\\new PianoStaff <<
+\\new PianoStaff \\with {
+    \\override StaffGrouper.staff-staff-spacing = #'(
+      (basic-distance . #{espace_entre_portees})
+      (padding . #{espace_entre_portees}))
+  }
+  <<
   #{MD.build}
   #{MG.build}
 >>
     LP
+  end
+  
+  def espace_entre_portees
+    @espace_entre_portees ||= 3
+  end
+  def espace_entre_portees= value
+    @espace_entre_portees = value
   end
   
   # Entête du fichier lilypond
@@ -176,6 +220,7 @@ class Score
     <<-HEADER
 \\header {
   title = "#{titre || ''}"
+  #{mark_subtitle}
   composer = "#{compositeur || ''}"
   #{mark_opus}
   #{mark_piece}
@@ -185,6 +230,10 @@ class Score
     HEADER
   end
   
+  def mark_subtitle
+    return "" if sous_titre.nil?
+    "subtitle = \"#{sous_titre}\""
+  end
   def mark_opus;        mark_property 'opus', 'Op. '; end
   def mark_piece;       mark_property 'piece';        end
   def mark_instrument;  mark_property 'instrument';   end

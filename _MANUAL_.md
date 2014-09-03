@@ -1,16 +1,21 @@
 # RLily
 
-[Indication de l'opus](#mark_opus)
-[Indication de l'armure](#armure)
-[Indication du tempo](#mark_tempo)
-[Indication de l'instrument](#mark_instrument)
-[Définir la taille de la partition](#define_score_size)
+* [Indication de l'opus](#mark_opus)
+*[Indication de l'armure](#armure)
+* [Indication du tempo](#mark_tempo)
+* [Indication de l'instrument](#mark_instrument)
 
-[Définition de l'octave](#define_octave)
-[Définir la clé](#define_cle)
-[Écrire un accord](#write_chord)
-[Écrire un triolet](#write_triolet)
-[Écrire un passage à l'octave](#write_a_loctave)
+* [Définir l'espace entre titre et premier système](#define_espace_avant_premier_systeme)
+* [Définir l'espacement entre les systèmes](#define_systeme_spacing)
+* [Définir l'espacement entre les portées (du piano)](#define_espace_entre_portees)
+* [Définir la taille de la partition (notes/portées)](#define_score_size)
+
+* [Écriture code partition]
+** [Définition de l'octave](#define_octave)
+** [Définir la clé](#define_cle)
+** [Écrire un accord](#write_chord)
+** [Écrire un triolet](#write_triolet)
+** [Écrire un passage à l'octave (8v---)](#write_a_loctave)
 
 * [Réglage des options](#set_options)
 ** [Demander l'affichage des dimensions](#option_show_spacing)
@@ -128,7 +133,21 @@ Par exemple, pour mettre la croche (8) à 60&nbsp;:
 
     SCORE::instrument = <instrument>
 
+<a name="define_espace_avant_premier_systeme"></a>
+##Définir l'espace entre titre et premier système
 
+    SCORE::espace_titre_systemes = <valeur>
+    
+<a name="define_systeme_spacing"></a>
+##Définir l'espacement entre les systèmes
+
+    SCORE::espace_entre_systemes = <valeur>
+    
+<a name="define_espace_entre_portees"></a>
+##Définir l'espace entre les portées
+
+    SCORE::espace_entre_portees = <valeur> # défaut : 3 (ne pas mettre une valeur trop grande)
+    
 <a name="define_score_size"></a>
 ##Définir la taille de la partition
 
