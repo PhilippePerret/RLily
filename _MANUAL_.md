@@ -10,7 +10,7 @@
 * [Définir l'espacement entre les portées (du piano)](#define_espace_entre_portees)
 * [Définir la taille de la partition (notes/portées)](#define_score_size)
 
-* [Écriture code partition]
+* [Écriture code partition](#write_code_partition)
 ** [Définition de l'octave](#define_octave)
 ** [Définir la clé](#define_cle)
 ** [Écrire un accord](#write_chord)
@@ -161,6 +161,19 @@ Où `<valeur>` peut être&nbsp;:
     LIVRE_CHANT / 18          Les livres de chant
     23 et 26
     
+
+<a name="write_code_partition"></a>
+#Écrire le code de la partition
+
+##Concaténation
+
+Pour éviter les erreurs en additionnant des strings, la class `String` a été modifiée&nbsp;:
+
+    "a" + "b"   => "a b"
+    "a" << "b"  => "a b"
+
+Donc il est inutile de terminer ou de commencer les strings de notes par des espaces.
+
 <a name="options_fonctions_music"></a>
 ##Options pour les fonctions musicales
 
@@ -173,6 +186,7 @@ Ces options sont le second argument de toutes les fonctions musicales. Elles peu
     :jeu          Le mode de jeu, défini explicitement avec du code 
                   lilypond (".", "-", etc.) ou les constantes textuelles
                   
+
 <a name="define_octave"></a>
 ##Définir l'octave
 
