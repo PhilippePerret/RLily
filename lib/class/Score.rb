@@ -141,10 +141,16 @@ class Score
   
   # Composition du code final
   def compose
+    # On demande d'abord de construire le code des portées pour pouvoir
+    # détecter les commandes-raccourcis qu'il faudra ajouter, par exemple
+    # la variable \circle
+    bloc_score
+    
     @code_final = []
     @code_final << definitions_preliminaires
     @code_final << paper_definition
     @code_final << lp_header
+    @code_final << commandes_raccourcis
     @code_final << header
     @code_final << bloc_score
     @code_final = @code_final.join("\n")
@@ -154,6 +160,7 @@ class Score
     mark_score_size
   end
   def bloc_score
+    @bloc_score ||= begin
     <<-LP
 \\score{
   #{staves}
@@ -161,6 +168,7 @@ class Score
   }
 }
     LP
+    end
   end
   
   # On sauve le fichier Lilypond produit
@@ -213,6 +221,18 @@ class Score
 \\version "#{Lilypond::version}"
 
     HEAD
+  end
+  
+  REQUIRED_COMMANDES_RACCOURCIS = {
+    :circle_note => false
+  }
+  # Commandes raccourcies
+  def commandes_raccourcis
+    str = []
+    if REQUIRED_COMMANDES_RACCOURCIS[:circle_note] || bloc_score.index("\\circle")
+      str << Score::CIRCLE_NOTE
+    end
+    str.join("\n")
   end
   
   # Entête header du fichier lilypond

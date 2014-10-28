@@ -56,10 +56,18 @@ def octave notes, nombre_octaves = 1
   "\\ottava ##{nombre_octaves}\n#{notes}"
 end
 
+#---------------------------------------------------------------------
+#   Méthodes de masquage/affichage
+#---------------------------------------------------------------------
+
 DATA_HIDE = {
   bar:    "Staff.BarLine",  barre: "Staff.BarLine",
   stem:   "Stem",     hampe: "Stem",
-  rest:   "Rest",     silence: "Rest"
+  rest:   "Rest",     silence: "Rest",
+  head:   "NoteHead", tete: "NoteHead",
+  slur:   "Slur",     liaison: "Slur",
+  metrique: "Staff.TimeSignature",
+  key: "Staff.Clef",  clef: "Staff.Clef"
 }
 # Masque un élément
 def hide key
@@ -68,4 +76,47 @@ end
 # Unmask un élément masqué
 def show key
   " \\undo \\hide #{DATA_HIDE[key]} "
+end
+
+#---------------------------------------------------------------------
+#   Méthodes textuelles
+#---------------------------------------------------------------------
+
+def write note, str, options = nil
+  options ||= {}
+  options = options.merge :up => true unless options.has_key?(:up)
+  options = options.merge :strech => true unless options.has_key?(:strech)
+  position = options[:up] ? "^" : "_"
+  str = str.gsub(/\"/, '\"')
+
+  code = ""
+  code << "\\textLengthOn\n" unless options[:strech] == false
+  code << "#{note}#{position}\"#{str}\""
+  code << "\n\\textLengthOff\n" unless options[:strech] == false
+  # "#{position}\\markup { \\line { #{str} } }"
+  return code
+end
+alias :ecrire :write
+alias :texte :write
+
+def mark notes, str, options = nil
+  options ||= {}
+  place = if options[:left]
+    "\n\\once \\override Score.RehearsalMark.self-alignment-X = #LEFT\n"+
+    "\\mark \"#{str}\"\n" +
+    notes
+  elsif options[:right]
+    notes
+    "\n\\once \\override Score.RehearsalMark.self-alignment-X = #RIGHT\n"+
+    "\\mark \"#{str}\"\n"
+  else
+    notes = notes.split(' ')
+    nombre_notes = notes.count
+    nb_moitie = (nombre_notes / 2) - 1
+    nb_reste  = (nombre_notes - nb_moitie) + 2
+    notes_avant = notes[0..nb_moitie].join(' ')
+    notes_apres = notes[(nb_moitie+1)..(nombre_notes-1)].join(' ')
+    
+    "#{notes_avant} \\mark \"#{str}\" #{notes_apres}"
+  end
 end

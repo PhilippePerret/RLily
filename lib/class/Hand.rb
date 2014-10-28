@@ -20,7 +20,7 @@ class Hand
   
   # Corrige les notes (p.e. les "#", "b", etc.)
   def correct_notes note
-    note.gsub!(/#/, 'is')
+    note.gsub!(/([a-g])#/, '\1is')
     # Les bémols
     note.gsub!(/([a-g])(b+)/){ $1 + "es" * $2.length}
     # Les barres
@@ -104,5 +104,6 @@ class Hand
     end
     "\\key #{SCORE::armure}"
   end
+  
   
 end

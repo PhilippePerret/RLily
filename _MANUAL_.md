@@ -1,4 +1,4 @@
-# RLily
+# RLily (Ruby to Lilypond)
 
 * [Introduction/Présentation](#introduction)
 * [Écriture du code partition](#write_code_partition)
@@ -10,6 +10,10 @@
   * [Écrire un triolet](#write_triolet)
   * [Écrire un passage à l'octave (8v---)](#write_a_loctave)
 * [Masquer des éléments de la partition](#masquer_element_score)
+* [Éléments graphiques](#graphic_elements)
+  * [Écrire une marque](#ecrire_une_marque)
+  * [Écrire un texte](#ecrire_un_texte)
+  * [Entourer une note d'un cercle](#entourer_note)
 * [Indication de l'opus](#mark_opus)
 * [Sous-titre](#sous_titre)
 * [Indication de l'armure](#armure)
@@ -19,7 +23,6 @@
 * [Définir l'espacement entre les systèmes](#define_systeme_spacing)
 * [Définir l'espacement entre les portées (du piano)](#define_espace_entre_portees)
 * [Définir la taille de la partition (notes/portées)](#define_score_size)
-
 * [Réglage des options](#set_options)
   * [Demander l'affichage des dimensions](#option_show_spacing)
   * [Ajouter un slash entre les systèmes](#option_slash_between_systemes)
@@ -122,8 +125,82 @@ On peut bien sûr indiquer tout sur une même ligne&nbsp;:
     Barres de mesure        :bar / :barre         hide(:bar)
     Hampes (Stems)          :stem / :hampe        hide(:stem)
     Silences (Rest)         :rest / :silence      hide(:rest)
+    Tête de notes           :head / :tete         hide(:head)
+    Liasons                 :slur / :liaison      hide(:slur)
+    Métrique                :metrique             hide(:metrique)
+    Clé                     :clef / :key          hide(:clef)
     ----------------------------------------------------------------
   
+<a name='graphic_elements'></a>
+#Éléments graphiques
+
+<a name='ecrire_une_marque'></a>
+##Écrire une marque
+
+*Note&nbsp;: une “marque” est plus visible, plus grosse qu'un texte. Pour écrire un “texte”, cf. [Écrire un texte](#ecrire_un_texte).*
+
+Utiliser la méthode `mark` pour placer une marque de répétition (pas de reprise, de répétition au sens de “répéter avec son groupe” par exemple).
+
+    mark("<notes>", "<texte de la marque>"[, { options }] )
+
+Par exemple&nbsp;:
+
+    MD << mark("c1 c", "Reprendre ce passage")
+
+Par défaut, la marque est placé **au centre de l'élément précédent et l'élément suivant.** Par exemple&nbsp;:
+
+    MD << mark("c1 c", "entre les deux")
+
+… placera le "entre les deux" centré au-dessus de la barre séparant les deux mesures.
+
+On peut demander que l'alignement se fasse à gauche ou à droite à l'aide du second argument de la méthode&nbsp;:
+
+    MD << mark("sur le premier", left: true)
+
+    MD << mark("c4 c c c", "sur le deuxième", right: true)
+
+<a name='ecrire_un_texte'></a>
+##Écrire un texte
+
+*Note&nbsp;: un “texte” est plus petit qu'une “Marque”. Pour écrire une marque (de répétition par exemple, cf. [Écrire une marque](#ecrire_une_marque)).*
+
+On peut utiliser la méthode `write` (ou ses alias `ecrire` ou `texte`) pour écrire un texte au-dessus/en dessous d'une note. 
+
+Le premier argument doit être la note, le deuxième argument doit être le texte et un troisième argument Hash peut définir les options.
+
+    ecrire( "<note>", "<texte>", {<options>} )
+
+Par exemple&nbsp;:
+
+    MD << write( "c", 'c\'est un DO') + "d"
+    # => Écrira "C'est un DO" sur la note DO
+    
+###Placer le texte en dessous
+
+On utilise le second argument de l'appel à la méthode en définissant la clé `:up`. Si elle est fausse, le texte est marqué en dessous de la note.
+
+Par exemple&nbsp;:
+
+    MG << texte('c', 'en dessous', { up: false } )
+
+###Ne pas étirer le texte
+
+Par défaut, la note suivante sera placée à la fin du texte. Pour éviter ce comportement, on peut ajouter `:strech => false` (ou `strech: false`) dans les options.
+
+Par exemple&nbsp;:
+
+    MD << write("c", "Un texte qui couvrira les autres notes", {strech: false} )
+
+*Noter que cette option ne s'applique qu'au texte visé. Les textes suivants seront à nouveau “étirant”.*
+
+<a name='entourer_note'></a>
+##Entourer une note d'un cercle
+
+Il suffit de placer `\circle` devant, par exemple&nbsp;:
+
+    MD << "c \\circle d e" # la note Ré sera entourée
+
+    
 <a name="mark_opus"></a>
 ##Indication de l'opus
 

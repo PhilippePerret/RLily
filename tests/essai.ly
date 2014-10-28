@@ -16,6 +16,7 @@ bottom-margin = 0.8\in
 \version "2.18.2"
 
 
+
 \header {
   title = "Extension Hanon - Exercice 61"
   
@@ -39,7 +40,14 @@ bottom-margin = 0.8\in
   \relative c' {
     \time 4/4
     \override Fingering.direction = #UP
-    c8 d e  \hide Stem  f g  \undo \hide Stem  a b c <c e g>
+    \textLengthOn c1 \mark "Au centre" c \once \override Score.RehearsalMark.self-alignment-X = #LEFT
+\mark "À gauche"
+c4 c c c c c \once \override Score.RehearsalMark.self-alignment-X = #RIGHT
+\mark "À droite" \textLengthOn
+c8^"Bonjour"
+\textLengthOff \textLengthOn
+c^"Au revoir"
+\textLengthOff c8^"Bonjour" c^"Au revoir" <c e g> \hide NoteHead  c16 b a g  \undo \hide NoteHead  f e d c16
   }
 }
 

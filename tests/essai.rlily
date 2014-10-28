@@ -6,8 +6,18 @@ SCORE::opus        = "17"
 SCORE::instrument   = "Piano"
 
 
-MD << "c8 d e #{hide(:stem)} f g #{show(:stem)} a b c"
+MD << "\\textLengthOn"
+MD << mark("c1 c", "Au centre")
+MD << mark("c4 c c c c c c c", "À gauche", left: true)
+MD << mark("c4 c c c c c c c", "À droite", right: true)
+MD << ecrire("c8", "Bonjour")
+MD << ecrire("c", "Au revoir")
+MD << ecrire("c8", "Bonjour", {strech: false})
+MD << ecrire("c", "Au revoir", {strech: false})
+
 MD << chord("c e g")
 
 MG << "c2 d #{hide :bar} | e f #{show :barre} | g a"
 MG << chord("c e g")
+
+MD << "#{hide :head} c16 b a g #{show :head} f e d c16"

@@ -38,19 +38,6 @@ SLUR_UP   = "\n\\slurUp"
 SLUR_DOWN = "\n\\slurDown"
 REVERT_SLUR = "\n\\slurNeutral"
 
-# ---------------------------------------------------------------------
-# BARRES DE MESURE
-
-BARRE_REPRISE_START = REP_START = ' \bar ".|:" '
-BARRE_REPRISE_END   = REP_END   = ' \bar ":|." '
-
-DOUBLE_BARRE = ' \bar "||" '
-
-BARRE_FIN = ' \bar "|." '
-
-NO_BARRES   = "\n\\omit Staff.BarLine\n"
-# SHOW_BARRES = "\n\\override Staff.BarLine.break-visibility = ##(#t #t #t)\n"
-SHOW_BARRES = "" # ça ne marche pas avec la ligne ci-dessus
 
 # ---------------------------------------------------------------------
 # DIVERS
