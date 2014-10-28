@@ -55,3 +55,17 @@ end
 def octave notes, nombre_octaves = 1
   "\\ottava ##{nombre_octaves}\n#{notes}"
 end
+
+DATA_HIDE = {
+  bar:    "Staff.BarLine",  barre: "Staff.BarLine",
+  stem:   "Stem",     hampe: "Stem",
+  rest:   "Rest",     silence: "Rest"
+}
+# Masque un élément
+def hide key
+  " \\hide #{DATA_HIDE[key]} "
+end
+# Unmask un élément masqué
+def show key
+  " \\undo \\hide #{DATA_HIDE[key]} "
+end

@@ -278,7 +278,7 @@ class Score
   
   # Définition du fichier source
   def source= path
-    path = "#{path}.rb" unless path.end_with?(".rb")
+    path = "#{path}.rlily" unless path.end_with?(".rlily")
     raise "Fichier introuvable (#{path})" unless File.exists? path
     @source = path
   end

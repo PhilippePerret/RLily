@@ -1,31 +1,39 @@
 # RLily
 
+* [Introduction/Présentation](#introduction)
+* [Écriture du code partition](#write_code_partition)
+  * [Écriture des notes](#write_notes)
+  * [Écrire des barres de mesure](#les_barres_de_mesure)
+  * [Définition de l'octave](#define_octave)
+  * [Définir la clé](#define_cle)
+  * [Écrire un accord](#write_chord)
+  * [Écrire un triolet](#write_triolet)
+  * [Écrire un passage à l'octave (8v---)](#write_a_loctave)
+* [Masquer des éléments de la partition](#masquer_element_score)
 * [Indication de l'opus](#mark_opus)
-*[Indication de l'armure](#armure)
+* [Sous-titre](#sous_titre)
+* [Indication de l'armure](#armure)
 * [Indication du tempo](#mark_tempo)
 * [Indication de l'instrument](#mark_instrument)
-
 * [Définir l'espace entre titre et premier système](#define_espace_avant_premier_systeme)
 * [Définir l'espacement entre les systèmes](#define_systeme_spacing)
 * [Définir l'espacement entre les portées (du piano)](#define_espace_entre_portees)
 * [Définir la taille de la partition (notes/portées)](#define_score_size)
 
-* [Écriture code partition](#write_code_partition)
-** [Définition de l'octave](#define_octave)
-** [Définir la clé](#define_cle)
-** [Écrire un accord](#write_chord)
-** [Écrire un triolet](#write_triolet)
-** [Écrire un passage à l'octave (8v---)](#write_a_loctave)
-
 * [Réglage des options](#set_options)
-** [Demander l'affichage des dimensions](#option_show_spacing)
-** [Ajouter un slash entre les systèmes](#option_slash_between_systemes)
+  * [Demander l'affichage des dimensions](#option_show_spacing)
+  * [Ajouter un slash entre les systèmes](#option_slash_between_systemes)
 
-    
-Permet de construire rapidement une partition à l'aide de Lilypond.
 
-1. Écrire le code en ruby (dans un fichier .rb)
-0. Taper `CMD + ALT + CTRL + S`
+<a name='introduction'></a>
+#Introduction présentation
+
+`RLily` permet de construire rapidement une partition à l'aide de Lilypond, en produisant un code façon ruby.
+
+Dans TextMate, avec le Bundle RLily&nbsp;:
+
+1. Écrire le code en ruby (dans un fichier .rlily)
+0. Taper `CMD + MAJ + P`
 
 Et la partition est produite.
 
@@ -33,13 +41,13 @@ Pour le moment, cette partition est très simple, elle est produite pour le pian
 
 ##Quick référence pour la création
 
-1. Créer le fichier ruby (.rb) qui va contenir le code pour la partition (c'est le "fichier source")
+1. Créer le fichier RLily (.rlily) qui va contenir le code pour la partition (c'est le "fichier source")
 0. Définir les données du score ([Données générales du score](#donnees_generales))
 0. Définir le contenu de chaque main avec `MD << "<notes>"` et `MG << "<notes>"`
   
 La suite dépend de l'utilisation ou non du Bundle `Phil:RLily`. S'il est présent :
 
-4. Avec le fichier source activé, utiliser le menu `Produire la partition` (ou jouer le raccourci `CMD + ALT + CTRL + S`)
+4. Avec le fichier source activé, utiliser le menu `Produire la partition` (ou jouer le raccourci `CMD + MAJ + P`)
 
 Si le bundle n'est pas présent&nbsp;:
 
@@ -49,7 +57,7 @@ Si le bundle n'est pas présent&nbsp;:
 
 ###En cas d'échec
 
-Dans certains dossiers, les permissions peuvent manquer. Dans ce cas, le programme ouvre le fichier `.ly` dans TextMate, et il suffit alors de taper `Command + R` pour produire la partition.
+Dans certains dossiers, les permissions peuvent manquer. Dans ce cas, le programme ouvre le fichier `.ly` dans TextMate (donc le fichier Lilypond que RLily produit), et il suffit alors de taper `CMD + R` pour produire la partition (si le Bundle Lilypond est installé).
 
 <a name="donnees_generales"></a>
 ##Données générales du score
@@ -88,6 +96,34 @@ ci-dessous, vous devez remplacer `PATH/TO/RUBY2LILY/` par le path à votre dossi
     $ sudo chmod u+x rlily
 
 
+<a name='masquer_element_score'></a>
+#Masquer des éléments de la partition
+
+On peut utiliser la pseudo-commande `hide(<element>)` (cacher) pour masquer des éléments de la partition, barres de mesures, hampes, etc.
+
+On utilise à l'inverse la pseudo-command `show(<element>)` pour qu'ils soient affichés à nouveau.
+
+Par exemple&nbsp;:
+
+    MD << "c8 d e"
+    MD << hide(:stem)
+    MD << "f g a" # Les stems ne seront pas affichés
+    MD << show(:stem)
+    MD << "b c e" # Les stemps sont remises
+
+On peut bien sûr indiquer tout sur une même ligne&nbsp;:
+
+    MD << "c8 d e #{hide(:stem)} f g a #{show(:stem)} b c e"
+
+Éléments qu'on peut masquer&nbsp;:
+
+        ÉLÉMENT                  CLÉ              EXEMPLE
+    ----------------------------------------------------------------
+    Barres de mesure        :bar / :barre         hide(:bar)
+    Hampes (Stems)          :stem / :hampe        hide(:stem)
+    Silences (Rest)         :rest / :silence      hide(:rest)
+    ----------------------------------------------------------------
+  
 <a name="mark_opus"></a>
 ##Indication de l'opus
 
@@ -98,6 +134,13 @@ Par exemple&nbsp;:
     SCORE::opus = 13
 
 *Note&nbsp;: Ne pas mettre "Opus" ou "Op."*
+
+<a name='sous_titre'></a>
+##Sous-titre
+
+Pour indiquer un sous-titre&nbsp;:
+
+    SCORE::sous_titre = "<le sous-titre>"
 
 <a name="armure"></a>
 ##Indication de l'armure
@@ -187,6 +230,62 @@ Ces options sont le second argument de toutes les fonctions musicales. Elles peu
                   lilypond (".", "-", etc.) ou les constantes textuelles
                   
 
+<a name='write_notes'></a>
+##Écriture des notes
+
+Les notes s'écrivent comme dans Lilypond, à l'aide de **lettres minuscules de `a` à `g`.**
+
+Pour les altérations, on peut utiliser la notation lilypond&nbsp;:
+
+    ais => la dièse
+    aes => la bémol
+
+… ou la notation avec `#` et `b`&nbsp;:
+
+    a#  => la dièse
+    ab  => la bémol
+    bb  => si bémol
+
+<a name="les_barres_de_mesure"></a>
+##Écrire les barres de mesure
+
+L'écriture des barres de mesure dans RLily est très intuitive.
+
+Pour une **double barre**, ils suffit d'écrire… une double-barre&nbsp;:
+
+    c a || b c
+
+Pour la **barre de fin**&nbsp;:
+
+    c a f ||.
+
+
+Pour une **reprise simple** :
+
+    |: c d e f :|
+
+Pour une **reprise avec alternative**
+
+    |: <notes> |1 <notes première fois> :|2 <notes deuxième fois> ||
+
+Plusieurs choses sont à noter ici&nbsp;:
+
+* Seules 2 alternatives sont possibles avec cette écriture. S'il doit y en avoir plus, utiliser le code normal de Lilipond&nbsp;:
+
+      \repeat volta <x fois> {
+        <notes>
+      }
+      \alternative {
+        { <première fois }
+        { <première alternative }
+        { <deuxième alternative }
+        ...
+        { <dernière fois> }
+      }
+* La fin de la deuxième alternative doit <u>obligatoirement</u> être indiquée par une double barre (`||`). Mais cette double-barre ne sera pas "écrite". Pour avoir réellement une double-barre sur la partition, il faut donc la répéter&nbsp;:
+
+      |: c |1 d :|2 e || ||
+      
 <a name="define_octave"></a>
 ##Définir l'octave
 

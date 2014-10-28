@@ -2,7 +2,12 @@
 \paper{
   annotate-spacing = ##f
 make-footer = ##f
-system-separator-markup = \slashSeparator = ##f
+top-margin = 0.8\in
+bottom-margin = 0.8\in
+  
+  
+  ragged-bottom = ##f
+  ragged-bottom-last = ##f
 }
 
 %{
@@ -13,6 +18,7 @@ system-separator-markup = \slashSeparator = ##f
 
 \header {
   title = "Extension Hanon - Exercice 61"
+  
   composer = "Phil Perret"
   opus = "Op. 17"
   
@@ -21,15 +27,19 @@ system-separator-markup = \slashSeparator = ##f
 
 
 \score{
-  \new PianoStaff <<
+  \new PianoStaff \with {
+    \override StaffGrouper.staff-staff-spacing = #'(
+      (basic-distance . 3)
+      (padding . 3))
+  }
+  <<
   \new Staff {
   
   \clef treble
   \relative c' {
     \time 4/4
     \override Fingering.direction = #UP
-    c d e
-<c e g>
+    c8 d e  \hide Stem  f g  \undo \hide Stem  a b c <c e g>
   }
 }
 
@@ -39,8 +49,7 @@ system-separator-markup = \slashSeparator = ##f
   \relative c {
     \time 4/4
     \override Fingering.direction = #DOWN
-    c d e
-<c e g>
+    c2 d  \hide Staff.BarLine  | e f  \undo \hide Staff.BarLine  | g a <c e g>
   }
 }
 

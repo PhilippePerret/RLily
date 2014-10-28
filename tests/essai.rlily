@@ -6,8 +6,8 @@ SCORE::opus        = "17"
 SCORE::instrument   = "Piano"
 
 
-MD << "c d e"
+MD << "c8 d e #{hide(:stem)} f g #{show(:stem)} a b c"
 MD << chord("c e g")
 
-MG << "c d e"
+MG << "c2 d #{hide :bar} | e f #{show :barre} | g a"
 MG << chord("c e g")

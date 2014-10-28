@@ -15,7 +15,47 @@ class Hand
   end
   
   # Ajoute quelque chose à la main
-  def << note; notes << note end
+  def << note; notes << correct_notes(note) end
+  
+  
+  # Corrige les notes (p.e. les "#", "b", etc.)
+  def correct_notes note
+    note.gsub!(/#/, 'is')
+    # Les bémols
+    note.gsub!(/([a-g])(b+)/){ $1 + "es" * $2.length}
+    # Les barres
+    note = note.gsub(/ ?\|\|\. ?/, ' \bar "|." ').strip # barre de fin ||.
+    note
+  end
+  
+  # Certaines corrections ne peuvent se faire qu'avec le texte complet
+  # D'autres part, les notes ({Array} pour le moment) sont rassemblées pour
+  # composer un string
+  REG_REPRISE = /\|\:(.*?)\|1(.*?)\:\|2(.*?)\|\|/
+  def correct_final_notes
+=begin
+\repeat volta 2 { c4 d e f | }
+\alternative {
+  { c2 e | }
+  { f2 g | }
+}
+=end
+    final = notes.join(" ")
+    if final.index("|1")
+      final.gsub!(REG_REPRISE){
+        volta = $1
+        alte1 = $2
+        alte2 = $3
+        "\\repeat volta 2 { #{volta.strip} } " +
+        "\\alternative { { #{alte1.strip} }" + "{ #{alte2.strip} } }"
+      }
+    end
+    final = final.gsub(/ ?\|\| ?/, ' \bar "||" ').strip  # double barre
+    final = final.gsub(/ ?\|\: ?/, ' \bar ".|:" ').strip # barre de reprise (ouverture)
+    final = final.gsub(/ ?\:\| ?/, ' \bar ":|." ').strip # barre de reprise (fermeture)
+    
+    return final
+  end
   
   # Initialise la liste des notes ou autres marques
   def notes;  @notes ||= []   end
@@ -33,13 +73,14 @@ class Hand
   \\relative #{relative} {
     \\time #{SCORE::metrique || '4/4'}
     \\override Fingering.direction = #{fingering_direction}
-    #{notes.join("\n")}
+    #{correct_final_notes}
   }
 }
     STAFF
   end
   
   ARMURES = {
+    "C"  => "",
     "C#" => "cis \\major", "C#m" => "cis \\minor",
     "Db" => "des \\major", "Dbm" => "des \\minor",
     "D" => "d \\major", "Dm" => "d \\minor",
@@ -57,7 +98,7 @@ class Hand
     "B" => "b \\major", "Bm" => "b \\minor"
   }
   def key_signature
-    return "" if SCORE::armure.nil?
+    return "" if SCORE::armure.nil? || SCORE::armure == "C"
     if ARMURES.has_key?(SCORE::armure)
       SCORE::armure = ARMURES[SCORE::armure]
     end
