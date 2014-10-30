@@ -341,6 +341,10 @@ Pour une **reprise simple** :
 
     |: c d e f :|
 
+Pour une **double reprise**&nbsp;:
+
+    |: c d e f :|: f e d c :|
+
 Pour une **reprise avec alternative**
 
     |: <notes> |1 <notes première fois> :|2 <notes deuxième fois> ||

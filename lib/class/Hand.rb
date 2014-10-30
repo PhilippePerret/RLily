@@ -22,7 +22,7 @@ class Hand
   def correct_notes note
     note.gsub!(/([a-g])#/, '\1is')
     # Les bémols
-    note.gsub!(/([a-g])(b+)/){ $1 + "es" * $2.length}
+    note.gsub!(/[<\( ]([a-g])(b+)/){ $1 + "es" * $2.length}
     # Les barres
     note = note.gsub(/ ?\|\|\. ?/, ' \bar "|." ').strip # barre de fin ||.
     note
@@ -50,9 +50,14 @@ class Hand
         "\\alternative { { #{alte1.strip} }" + "{ #{alte2.strip} } }"
       }
     end
+    # Double barre de reprise (ouverture)
+    final = final.gsub(/ ?\:\|?\|\: ?/, ' DOUBLE_BARRE_REPRISE ').strip
+    # Double barres
     final = final.gsub(/ ?\|\| ?/, ' \bar "||" ').strip  # double barre
     final = final.gsub(/ ?\|\: ?/, ' \bar ".|:" ').strip # barre de reprise (ouverture)
     final = final.gsub(/ ?\:\| ?/, ' \bar ":|." ').strip # barre de reprise (fermeture)
+    
+    final = final.gsub(/DOUBLE_BARRE_REPRISE/, ' \bar ":|.|:" ')
     
     return final
   end
