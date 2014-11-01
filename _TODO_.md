@@ -1,1 +1,1 @@
-* Pour écrire un texte
+* Pouvoir déterminer de ne pas afficher les deux portées.

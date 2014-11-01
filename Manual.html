@@ -302,24 +302,19 @@ sup {
 	}
 }
 </style>
-<title>RLily</title>
+<title>RLily (Ruby to Lilypond)</title>
 
 </head>
 <body>
-<h1>RLily</h1>
+<h1>RLily (Ruby to Lilypond)</h1>
 
 <ul>
-<li><a href="#mark_opus">Indication de l'opus</a></li>
-<li><a href="#armure">Indication de l'armure</a></li>
-<li><a href="#mark_tempo">Indication du tempo</a></li>
-<li><a href="#mark_instrument">Indication de l'instrument</a></li>
-<li><a href="#define_espace_avant_premier_systeme">Définir l'espace entre titre et premier système</a></li>
-<li><a href="#define_systeme_spacing">Définir l'espacement entre les systèmes</a></li>
-<li><a href="#define_espace_entre_portees">Définir l'espacement entre les portées (du piano)</a></li>
-<li><a href="#define_score_size">Définir la taille de la partition (notes/portées)</a></li>
-<li><p><a href="#write_code_partition">Écriture code partition</a></p>
+<li><a href="#introduction">Introduction/Présentation</a></li>
+<li><a href="#write_code_partition">Écriture du code partition</a>
 
 <ul>
+<li><a href="#write_notes">Écriture des notes</a></li>
+<li><a href="#les_barres_de_mesure">Écrire des barres de mesure</a></li>
 <li><a href="#define_octave">Définition de l'octave</a></li>
 <li><a href="#define_cle">Définir la clé</a></li>
 <li><a href="#write_chord">Écrire un accord</a></li>
@@ -327,7 +322,25 @@ sup {
 <li><a href="#write_a_loctave">Écrire un passage à l'octave (8v---)</a></li>
 </ul>
 </li>
-<li><p><a href="#set_options">Réglage des options</a></p>
+<li><a href="#masquer_element_score">Masquer des éléments de la partition</a></li>
+<li><a href="#graphic_elements">Éléments graphiques</a>
+
+<ul>
+<li><a href="#ecrire_une_marque">Écrire une marque</a></li>
+<li><a href="#ecrire_un_texte">Écrire un texte</a></li>
+<li><a href="#entourer_note">Entourer une note d'un cercle</a></li>
+</ul>
+</li>
+<li><a href="#mark_opus">Indication de l'opus</a></li>
+<li><a href="#sous_titre">Sous-titre</a></li>
+<li><a href="#armure">Indication de l'armure</a></li>
+<li><a href="#mark_tempo">Indication du tempo</a></li>
+<li><a href="#mark_instrument">Indication de l'instrument</a></li>
+<li><a href="#define_espace_avant_premier_systeme">Définir l'espace entre titre et premier système</a></li>
+<li><a href="#define_systeme_spacing">Définir l'espacement entre les systèmes</a></li>
+<li><a href="#define_espace_entre_portees">Définir l'espacement entre les portées (du piano)</a></li>
+<li><a href="#define_score_size">Définir la taille de la partition (notes/portées)</a></li>
+<li><a href="#set_options">Réglage des options</a>
 
 <ul>
 <li><a href="#option_show_spacing">Demander l'affichage des dimensions</a></li>
@@ -337,11 +350,17 @@ sup {
 </ul>
 
 
-<p>Permet de construire rapidement une partition à l'aide de Lilypond.</p>
+<p><a name='introduction'></a></p>
+
+<h1>Introduction présentation</h1>
+
+<p><code>RLily</code> permet de construire rapidement une partition à l'aide de Lilypond, en produisant un code façon ruby.</p>
+
+<p>Dans TextMate, avec le Bundle RLily&nbsp;:</p>
 
 <ol>
-<li>Écrire le code en ruby (dans un fichier .rb)</li>
-<li>Taper <code>CMD + ALT + CTRL + S</code></li>
+<li>Écrire le code en ruby (dans un fichier .rlily)</li>
+<li>Taper <code>CMD + MAJ + P</code></li>
 </ol>
 
 
@@ -376,7 +395,7 @@ sup {
 
 <h3>En cas d'échec</h3>
 
-<p>Dans certains dossiers, les permissions peuvent manquer. Dans ce cas, le programme ouvre le fichier <code>.rlily</code> dans TextMate, et il suffit alors de taper <code>CMD + MAJ + P</code> pour produire la partition.</p>
+<p>Dans certains dossiers, les permissions peuvent manquer. Dans ce cas, le programme ouvre le fichier <code>.ly</code> dans TextMate (donc le fichier Lilypond que RLily produit), et il suffit alors de taper <code>CMD + R</code> pour produire la partition (si le Bundle Lilypond est installé).</p>
 
 <p><a name="donnees_generales"></a></p>
 
@@ -416,6 +435,152 @@ $ sudo chmod 0777 rlily
 $ sudo chmod u+x rlily
 </code></pre>
 
+<p><a name='masquer_element_score'></a></p>
+
+<h1>Masquer des éléments de la partition</h1>
+
+<p>On peut utiliser la pseudo-commande <code>hide(&lt;element&gt;)</code> (cacher) pour masquer des éléments de la partition, barres de mesures, hampes, etc.</p>
+
+<p><code>&lt;element&gt;</code> peut être&nbsp;:</p>
+
+<pre><code>Un Symbole              :beam
+Une liste de symboles   [:beam, :staff]
+Le symbole spécial      :all
+</code></pre>
+
+<p>Quand <code>:all</code> est envoyé à <code>hide</code>, peut définir les éléments qui ne doivent pas être masqués à l'aide d'un second argument&nbsp;:</p>
+
+<pre><code>hide( :all, { except: [&lt;liste de symboles&gt;] } )
+</code></pre>
+
+<p>Par exemple, pour masquer tout sauf les liaisons&nbsp;:</p>
+
+<pre><code>hide( :all, { except: [:slur] } )
+</code></pre>
+
+<p>On utilise à l'inverse la pseudo-command <code>show(&lt;element&gt;)</code> pour que les éléments soient affichés à nouveau.</p>
+
+<p>Par exemple&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; "c8 d e"
+MD &lt;&lt; hide(:stem)
+MD &lt;&lt; "f g a" # Les stems ne seront pas affichés
+MD &lt;&lt; show(:stem)
+MD &lt;&lt; "b c e" # Les stemps sont remises
+</code></pre>
+
+<p>On peut bien sûr indiquer tout sur une même ligne&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; "c8 d e #{hide(:stem)} f g a #{show(:stem)} b c e"
+</code></pre>
+
+<p><em>Note&nbsp;: Si ce qui est à remontrer avec <code>show</code> est identique à ce qui a été masqué avec <code>hide</code>, on peut simplement utiliser <code>show</code> sans arguments&nbsp;:</em></p>
+
+<pre><code>MD &lt;&lt; "c8 d e"
+MD &lt;&lt; hide([:stem, :staff])
+MD &lt;&lt; "f g a" # Les stems et la portée ne seront pas affichés
+MD &lt;&lt; show
+MD &lt;&lt; "b c e" # Les stemps et la portée ré-apparaissent
+</code></pre>
+
+<p>Éléments qu'on peut masquer&nbsp;:</p>
+
+<pre><code>    ÉLÉMENT                  CLÉ              EXEMPLE
+----------------------------------------------------------------
+TOUS                    :all  / :tous
+Barres de mesure        :bar / :barre         hide(:bar)
+Hampes (Stems)          :stem / :hampe        hide(:stem)
+Silences (Rest)         :rest / :silence      hide(:rest)
+Tête de notes           :head / :tete         hide(:head)
+Liasons                 :slur / :liaison      hide(:slur)
+Crochets                :beam / :crochet      hide(:beam)
+Métrique                :metrique             hide(:metrique)
+Clé                     :clef / :key          hide(:clef)
+----------------------------------------------------------------
+</code></pre>
+
+<p><a name='graphic_elements'></a></p>
+
+<h1>Éléments graphiques</h1>
+
+<p><a name='ecrire_une_marque'></a></p>
+
+<h2>Écrire une marque</h2>
+
+<p><em>Note&nbsp;: une “marque” est plus visible, plus grosse qu'un texte. Pour écrire un “texte”, cf. <a href="#ecrire_un_texte">Écrire un texte</a>.</em></p>
+
+<p>Utiliser la méthode <code>mark</code> pour placer une marque de répétition (pas de reprise, de répétition au sens de “répéter avec son groupe” par exemple).</p>
+
+<pre><code>mark("&lt;notes&gt;", "&lt;texte de la marque&gt;"[, { options }] )
+</code></pre>
+
+<p>Par exemple&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; mark("c1 c", "Reprendre ce passage")
+</code></pre>
+
+<p>Par défaut, la marque est placé <strong>au centre de l'élément précédent et l'élément suivant.</strong> Par exemple&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; mark("c1 c", "entre les deux")
+</code></pre>
+
+<p>… placera le "entre les deux" centré au-dessus de la barre séparant les deux mesures.</p>
+
+<p>On peut demander que l'alignement se fasse à gauche ou à droite à l'aide du second argument de la méthode&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; mark("sur le premier", left: true)
+
+MD &lt;&lt; mark("c4 c c c", "sur le deuxième", right: true)
+</code></pre>
+
+<p><a name='ecrire_un_texte'></a></p>
+
+<h2>Écrire un texte</h2>
+
+<p><em>Note&nbsp;: un “texte” est plus petit qu'une “Marque”. Pour écrire une marque (de répétition par exemple, cf. <a href="#ecrire_une_marque">Écrire une marque</a>).</em></p>
+
+<p>On peut utiliser la méthode <code>write</code> (ou ses alias <code>ecrire</code> ou <code>texte</code>) pour écrire un texte au-dessus/en dessous d'une note.</p>
+
+<p>Le premier argument doit être la note, le deuxième argument doit être le texte et un troisième argument Hash peut définir les options.</p>
+
+<pre><code>ecrire( "&lt;note&gt;", "&lt;texte&gt;", {&lt;options&gt;} )
+</code></pre>
+
+<p>Par exemple&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; write( "c", 'c\'est un DO') + "d"
+# =&gt; Écrira "C'est un DO" sur la note DO
+</code></pre>
+
+<h3>Placer le texte en dessous</h3>
+
+<p>On utilise le second argument de l'appel à la méthode en définissant la clé <code>:up</code>. Si elle est fausse, le texte est marqué en dessous de la note.</p>
+
+<p>Par exemple&nbsp;:</p>
+
+<pre><code>MG &lt;&lt; texte('c', 'en dessous', { up: false } )
+</code></pre>
+
+<h3>Ne pas étirer le texte</h3>
+
+<p>Par défaut, la note suivante sera placée à la fin du texte. Pour éviter ce comportement, on peut ajouter <code>:strech =&gt; false</code> (ou <code>strech: false</code>) dans les options.</p>
+
+<p>Par exemple&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; write("c", "Un texte qui couvrira les autres notes", {strech: false} )
+</code></pre>
+
+<p><em>Noter que cette option ne s'applique qu'au texte visé. Les textes suivants seront à nouveau “étirant”.</em></p>
+
+<p><a name='entourer_note'></a></p>
+
+<h2>Entourer une note d'un cercle</h2>
+
+<p>Il suffit de placer <code>\circle</code> devant, par exemple&nbsp;:</p>
+
+<pre><code>MD &lt;&lt; "c \\circle d e" # la note Ré sera entourée
+</code></pre>
+
 <p><a name="mark_opus"></a></p>
 
 <h2>Indication de l'opus</h2>
@@ -429,6 +594,15 @@ $ sudo chmod u+x rlily
 </code></pre>
 
 <p><em>Note&nbsp;: Ne pas mettre "Opus" ou "Op."</em></p>
+
+<p><a name='sous_titre'></a></p>
+
+<h2>Sous-titre</h2>
+
+<p>Pour indiquer un sous-titre&nbsp;:</p>
+
+<pre><code>SCORE::sous_titre = "&lt;le sous-titre&gt;"
+</code></pre>
 
 <p><a name="armure"></a></p>
 
@@ -536,6 +710,79 @@ LIVRE_CHANT / 18          Les livres de chant
 :jeu          Le mode de jeu, défini explicitement avec du code 
               lilypond (".", "-", etc.) ou les constantes textuelles
 </code></pre>
+
+<p><a name='write_notes'></a></p>
+
+<h2>Écriture des notes</h2>
+
+<p>Les notes s'écrivent comme dans Lilypond, à l'aide de <strong>lettres minuscules de <code>a</code> à <code>g</code>.</strong></p>
+
+<p>Pour les altérations, on peut utiliser la notation lilypond&nbsp;:</p>
+
+<pre><code>ais =&gt; la dièse
+aes =&gt; la bémol
+</code></pre>
+
+<p>… ou la notation avec <code>#</code> et <code>b</code>&nbsp;:</p>
+
+<pre><code>a#  =&gt; la dièse
+ab  =&gt; la bémol
+bb  =&gt; si bémol
+</code></pre>
+
+<p><a name="les_barres_de_mesure"></a></p>
+
+<h2>Écrire les barres de mesure</h2>
+
+<p>L'écriture des barres de mesure dans RLily est très intuitive.</p>
+
+<p>Pour une <strong>double barre</strong>, ils suffit d'écrire… une double-barre&nbsp;:</p>
+
+<pre><code>c a || b c
+</code></pre>
+
+<p>Pour la <strong>barre de fin</strong>&nbsp;:</p>
+
+<pre><code>c a f ||.
+</code></pre>
+
+<p>Pour une <strong>reprise simple</strong> :</p>
+
+<pre><code>|: c d e f :|
+</code></pre>
+
+<p>Pour une <strong>double reprise</strong>&nbsp;:</p>
+
+<pre><code>|: c d e f :|: f e d c :|
+</code></pre>
+
+<p>Pour une <strong>reprise avec alternative</strong></p>
+
+<pre><code>|: &lt;notes&gt; |1 &lt;notes première fois&gt; :|2 &lt;notes deuxième fois&gt; ||
+</code></pre>
+
+<p>Plusieurs choses sont à noter ici&nbsp;:</p>
+
+<ul>
+<li><p>Seules 2 alternatives sont possibles avec cette écriture. S'il doit y en avoir plus, utiliser le code normal de Lilipond&nbsp;:</p>
+
+<pre><code>\repeat volta &lt;x fois&gt; {
+  &lt;notes&gt;
+}
+\alternative {
+  { &lt;première fois }
+  { &lt;première alternative }
+  { &lt;deuxième alternative }
+  ...
+  { &lt;dernière fois&gt; }
+}
+</code></pre></li>
+<li><p>La fin de la deuxième alternative doit <u>obligatoirement</u> être indiquée par une double barre (<code>||</code>). Mais cette double-barre ne sera pas "écrite". Pour avoir réellement une double-barre sur la partition, il faut donc la répéter&nbsp;:</p>
+
+<pre><code>|: c |1 d :|2 e || ||
+</code></pre></li>
+</ul>
+
 
 <p><a name="define_octave"></a></p>
 

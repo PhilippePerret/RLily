@@ -103,8 +103,22 @@ ci-dessous, vous devez remplacer `PATH/TO/RUBY2LILY/` par le path à votre dossi
 #Masquer des éléments de la partition
 
 On peut utiliser la pseudo-commande `hide(<element>)` (cacher) pour masquer des éléments de la partition, barres de mesures, hampes, etc.
+  
+`<element>` peut être&nbsp;:
+  
+    Un Symbole              :beam
+    Une liste de symboles   [:beam, :staff]
+    Le symbole spécial      :all
 
-On utilise à l'inverse la pseudo-command `show(<element>)` pour qu'ils soient affichés à nouveau.
+Quand `:all` est envoyé à `hide`, peut définir les éléments qui ne doivent pas être masqués à l'aide d'un second argument&nbsp;:
+
+    hide( :all, { except: [<liste de symboles>] } )
+
+Par exemple, pour masquer tout sauf les liaisons&nbsp;:
+
+    hide( :all, { except: [:slur] } )
+
+On utilise à l'inverse la pseudo-command `show(<element>)` pour que les éléments soient affichés à nouveau.
 
 Par exemple&nbsp;:
 
@@ -118,15 +132,26 @@ On peut bien sûr indiquer tout sur une même ligne&nbsp;:
 
     MD << "c8 d e #{hide(:stem)} f g a #{show(:stem)} b c e"
 
+*Note&nbsp;: Si ce qui est à remontrer avec `show` est identique à ce qui a été masqué avec `hide`, on peut simplement utiliser `show` sans arguments&nbsp;:*
+
+    MD << "c8 d e"
+    MD << hide([:stem, :staff])
+    MD << "f g a" # Les stems et la portée ne seront pas affichés
+    MD << show
+    MD << "b c e" # Les stemps et la portée ré-apparaissent
+
+
 Éléments qu'on peut masquer&nbsp;:
 
         ÉLÉMENT                  CLÉ              EXEMPLE
     ----------------------------------------------------------------
+    TOUS                    :all  / :tous
     Barres de mesure        :bar / :barre         hide(:bar)
     Hampes (Stems)          :stem / :hampe        hide(:stem)
     Silences (Rest)         :rest / :silence      hide(:rest)
     Tête de notes           :head / :tete         hide(:head)
     Liasons                 :slur / :liaison      hide(:slur)
+    Crochets                :beam / :crochet      hide(:beam)
     Métrique                :metrique             hide(:metrique)
     Clé                     :clef / :key          hide(:clef)
     ----------------------------------------------------------------

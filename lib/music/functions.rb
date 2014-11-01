@@ -61,21 +61,84 @@ end
 #---------------------------------------------------------------------
 
 DATA_HIDE = {
-  bar:    "Staff.BarLine",  barre: "Staff.BarLine",
-  stem:   "Stem",     hampe: "Stem",
-  rest:   "Rest",     silence: "Rest",
-  head:   "NoteHead", tete: "NoteHead",
-  slur:   "Slur",     liaison: "Slur",
-  metrique: "Staff.TimeSignature",
-  key: "Staff.Clef",  clef: "Staff.Clef"
+  bar:    {mark: "Staff.BarLine", with_all: true},
+  stem:   {mark: "Stem", with_all: true},
+  rest:   {mark: "Rest", with_all: true},
+  head:   {mark: "NoteHead", with_all: true},
+  slur:   {mark: "Slur", with_all: true},
+  beam:   {mark: "Beam", with_all: true}, 
+  metrique: {mark: "Staff.TimeSignature", with_all: false},
+  key: {mark: "Staff.Clef", with_all: false},
+  staff: {mark_hide: "\\stopStaff", mark_show: "\\startStaff", with_all: true}
 }
+DATA_HIDE_FR2EN = {
+  :barre => :bar, :hampe => :stem, :silence => :rest, :tete => :head,
+  :liaison => :slur, :croche => :beam, :clef => :key, :cle => :key,
+  :portee => :staff, :crochet => :beam
+}
+
 # Masque un élément
-def hide key
-  " \\hide #{DATA_HIDE[key]} "
+# La clé spéciale :all permet de tout masquer, sauf les valeurs spécifiées
+# dans la propriété :except ({Array}) des +options+
+def hide key, options = nil
+  key = :all if key == :tous
+  options = complete_hideshow_options options
+  @hiddens          = key
+  @options_hiddens  = options
+  hidden_elements(key, options).collect do |key|
+    raise "La clé hide #{key} est inconnue" if key.nil?
+    get_hide_mark key
+  end.join(' ').prepend(" ").concat(" ")
 end
 # Unmask un élément masqué
-def show key
-  " \\undo \\hide #{DATA_HIDE[key]} "
+def show key = nil, options = nil
+  key     ||= @hiddens
+  options ||= @options_hiddens
+  hidden_elements(key, options).collect do |k|
+    raise "La clé show #{k} est inconnue" if k.nil?
+    get_show_mark k
+  end.join(' ').prepend(" ").concat(" ")
+end
+
+def hidden_elements key, options
+  if key == :all
+    DATA_HIDE.collect do |khide, dhide|
+      next nil if dhide[:with_all] == false || options[:except].include?( khide )
+      khide
+    end.reject{ |e| e.nil? }
+  elsif key.class == Array
+    key
+  else
+    [key]
+  end.collect do |k|
+    if DATA_HIDE.has_key?( k )
+      k
+    else
+      DATA_HIDE_FR2EN[ k ]
+    end
+  end
+end
+def get_hide_mark key
+  data_key = DATA_HIDE[key]
+  if data_key[:mark]
+    "\\hide #{DATA_HIDE[key][:mark]}"
+  else
+    data_key[:mark_hide]
+  end
+end
+def get_show_mark key
+  data_key = DATA_HIDE[key]
+  if data_key[:mark]
+    "\\undo \\hide #{DATA_HIDE[key][:mark]}"
+  else
+    data_key[:mark_show]
+  end
+end
+
+def complete_hideshow_options options
+  options ||= {}
+  options = options.merge(except: []) unless options.has_key? :except
+  options
 end
 
 #---------------------------------------------------------------------
