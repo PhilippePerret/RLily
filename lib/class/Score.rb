@@ -1,3 +1,4 @@
+# encoding: UTF-8
 =begin
 
 Class pour produire la partition
@@ -37,10 +38,13 @@ class Score
   # Le code lilypond final produit
   attr_reader :code_final
   
-  # Les systèmes créés (en général un seul)
+  # Les systèmes créés (en général un seul, double)
   attr_accessor :staves
   
   # Données à définir à l'aide de SCORE::<donnée>
+  attr_accessor :verbose # defaut : nil
+  
+  attr_accessor :no_header
   attr_accessor :titre
   attr_accessor :sous_titre
   attr_accessor :compositeur
@@ -50,6 +54,8 @@ class Score
   attr_accessor :metrique
   attr_accessor :armure
   attr_accessor :tempo
+  # format de sortie (défaut: :pdf, peut être : :pdf, :png)
+  attr_accessor :output_format
   # Espaces
   attr_accessor :espace_titre_systemes  # entre le titre et le 1er système
   attr_accessor :espace_entre_systemes  # entre les systèmes
@@ -108,16 +114,36 @@ class Score
     load_source
     compose
     save_lilypond_file
+        
+    # Production du PDF ou du PNG
+    res = case output_format
+    when :pdf, nil
+      output_as_pdf
+    when :png
+      output_as_png
+    else
+      dbg "Format de sortie inconnu (#{output_format}). Je sors en pdf"
+      output_as_pdf
+    end
     
-    # Production du PDF
+    if res === false || verbose
+      App::show_debug
+    end
+  end
+  
+  ##
+  #
+  # Sortie de la partition au format PDF
+  #
+  def output_as_pdf
     begin
       cmd = "cd \"#{folder}\";echo \"#{App::su_password}\" | sudo -S lilypond \"#{lilypond_filepath}\" 2>&1"
       dbg "Commande lilypond : #{cmd}", :notice
       `#{cmd}`
     rescue Exception => e
       dbg "Le construction du PDF a échoué.", :error
+      return false
     end
-    
 
     if File.exists?(pdf_filepath)
       dbg "\n\nLA PARTITION A ÉTÉ PRODUITE AVEC SUCCÈS\n#{pdf_filepath}", :notice
@@ -128,11 +154,40 @@ class Score
       dbg "Tape Pomme + R pour lancer la création de la partition à partir du fichier .ly produit."
       # Ouverture du fichier .ly pour le créer
       `mate "#{lilypond_filepath}"`
-      App::show_debug
+      return false
     end
-        
+    return true
   end
   
+  ##
+  #
+  # Sortie de la partition au format PNG
+  #
+  def output_as_png
+    begin
+      # Commande spéciale pour les png
+      cmdllp = "lilypond -dbackend=eps -dno-gs-load-fonts -dinclude-eps-fonts -dpixmap-format=pngalpha --png \"#{lilypond_filepath}\""
+      cmd = "cd \"#{folder}\";echo \"#{App::su_password}\" | sudo -S #{cmdllp} 2>&1"
+      dbg "Commande lilypond : #{cmd}", :notice
+      `#{cmd}`
+    rescue Exception => e
+      dbg "Le construction du PNG a échoué.", :error
+      return false
+    end
+
+    if File.exists?(png_filepath)
+      dbg "\n\nLA PARTITION A ÉTÉ PRODUITE AVEC SUCCÈS EN IMAGE PNG\n#{png_filepath}", :notice
+      # Ouverture du fichier PDF
+      `open "#{png_filepath}"`
+      return true
+    else
+      dbg "\n\nIMPOSSIBLE DE PRODUIRE L'IMAGE PNG DE LA PARTITION…", :error
+      dbg "Tape Pomme + R pour lancer la création de la partition à partir du fichier .ly produit."
+      # Ouverture du fichier .ly pour le créer
+      `mate "#{lilypond_filepath}"`
+      return false
+    end
+  end
   
   # Chargement du code source
   def load_source
@@ -273,6 +328,7 @@ class Score
   def erase_old_files
     File.unlink lilypond_filepath if File.exists? lilypond_filepath
     File.unlink pdf_filepath if File.exists? pdf_filepath
+    App::init_log
   end
   
   # ---------------------------------------------------------------------
@@ -294,6 +350,9 @@ class Score
   
   def pdf_filepath
     @pdf_filepath ||= File.join(folder, "#{affixe}.pdf")
+  end
+  def png_filepath
+    @png_filepath ||= File.join(folder, "#{affixe}.png")
   end
   
   # Définition du fichier source

@@ -27,7 +27,7 @@ require_relative 'lib/required'
 
 begin
   # raise "Pour tenter de voir la sortie"
-  SCORE.source= SCORE_PATH
+  SCORE.source = SCORE_PATH
   SCORE.build
 rescue Exception => e
   dbg "ERREUR : #{e.message}", :error

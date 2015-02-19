@@ -1,3 +1,4 @@
+# encoding: UTF-8
 
 # Dossier principal
 FOLDER_RLILY = File.expand_path(File.dirname(File.dirname(__FILE__)))

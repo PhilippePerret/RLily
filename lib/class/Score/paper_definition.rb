@@ -1,3 +1,4 @@
+# encoding: UTF-8
 Dir["#{FOLDER_LIB}/class/Score/**/*.rb"].each{|m| require m}
 class Score
   def paper_definition
@@ -10,6 +11,7 @@ class Score
     end
     papdef = <<-LP
 \\paper{
+  #{no_header == true ? paper_with_no_header : ''}
   #{liste_options.join("\n")}
   #{mark_espace_titre_systemes}
   #{mark_espace_entre_systemes}
@@ -47,5 +49,22 @@ class Score
       (stretchability   . 0)
     ) 
     LP
+  end
+  
+  ##
+  #
+  # Définition de paper lorsque l'option `no_header' est choisie
+  #
+  # Ce code doit s'insérer dans : \paper{ ... ici ... }
+  #
+  def paper_with_no_header
+    <<-HTML
+  indent           = 0\\mm
+  line-width       = 120\\mm
+  oddFooterMarkup  = ##f
+  oddHeaderMarkup  = ##f
+  bookTitleMarkup  = ##f
+  scoreTitleMarkup = ##f
+    HTML
   end
 end

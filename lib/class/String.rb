@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class String
 
   # # Modification de `+' et `<<' pour ajouter toujours une espace

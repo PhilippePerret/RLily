@@ -10,6 +10,8 @@
   * [Écrire un triolet](#write_triolet)
   * [Écrire un passage à l'octave (8v---)](#write_a_loctave)
 * [Masquer des éléments de la partition](#masquer_element_score)
+  * [Masquer les barres, les notes, les silences, etc.](#masquer_portee_note_barre_etc)
+  * [Masquer tout l'entête de la partition (titre, etc.)](#masquer_tout_le_header)
 * [Éléments graphiques](#graphic_elements)
   * [Écrire une marque](#ecrire_une_marque)
   * [Écrire un texte](#ecrire_un_texte)
@@ -23,6 +25,7 @@
 * [Définir l'espacement entre les systèmes](#define_systeme_spacing)
 * [Définir l'espacement entre les portées (du piano)](#define_espace_entre_portees)
 * [Définir la taille de la partition (notes/portées)](#define_score_size)
+* [Définir le format de sortie](#define_output_format)
 * [Réglage des options](#set_options)
   * [Demander l'affichage des dimensions](#option_show_spacing)
   * [Ajouter un slash entre les systèmes](#option_slash_between_systemes)
@@ -44,7 +47,7 @@ Pour le moment, cette partition est très simple, elle est produite pour le pian
 
 ##Quick référence pour la création
 
-1. Créer le fichier RLily (.rlily) qui va contenir le code pour la partition (c'est le "fichier source")
+1. Créer le fichier RLily (`.rlily`) qui va contenir le code pour la partition (c'est le "fichier source")
 0. Définir les données du score ([Données générales du score](#donnees_generales))
 0. Définir le contenu de chaque main avec `MD << "<notes>"` et `MG << "<notes>"`
   
@@ -102,13 +105,17 @@ ci-dessous, vous devez remplacer `PATH/TO/RUBY2LILY/` par le path à votre dossi
 <a name='masquer_element_score'></a>
 #Masquer des éléments de la partition
 
+<a name='masquer_portee_note_barre_etc'></a>
+##Masquer les barres, les notes, les silences, etc.
+
+
 On peut utiliser la pseudo-commande `hide(<element>)` (cacher) pour masquer des éléments de la partition, barres de mesures, hampes, etc.
   
-`<element>` peut être&nbsp;:
+`<element>` peut être (voir plus bas toutes les valeurs possibles)&nbsp;:
   
+    Tous                    :all          Tout est masqué
     Un Symbole              :beam
     Une liste de symboles   [:beam, :staff]
-    Le symbole spécial      :all
 
 Quand `:all` est envoyé à `hide`, peut définir les éléments qui ne doivent pas être masqués à l'aide d'un second argument&nbsp;:
 
@@ -155,7 +162,17 @@ On peut bien sûr indiquer tout sur une même ligne&nbsp;:
     Métrique                :metrique             hide(:metrique)
     Clé                     :clef / :key          hide(:clef)
     ----------------------------------------------------------------
-  
+
+<a name='masquer_tout_le_header'></a>
+##Masquer tout l'entête de la partition (titre, etc.)
+
+Pour les images (`Score::output_format = :png`), il peut être utile de supprimer tout entête, titre, opus, etc. si c'est juste un extrait de partition qu'on veut afficher.
+
+On peut supprimer facilement tout entête en indiquant en haut du fichier RLily&nbsp;:
+
+    Score::no_header = true
+
+
 <a name='graphic_elements'></a>
 #Éléments graphiques
 
@@ -306,6 +323,14 @@ Où `<valeur>` peut être&nbsp;:
     LIVRE_CHANT / 18          Les livres de chant
     23 et 26
     
+<a name='define_output_format'></a>
+##Définir le format de sortie
+
+Par défaut, le programme produit un PDF de la partition.
+
+On peut définir de sortir une image PNG plutôt en utilisant&nbsp;:
+
+    SCORE::output_format = :png
 
 <a name="write_code_partition"></a>
 #Écrire le code de la partition
@@ -347,6 +372,13 @@ Pour les altérations, on peut utiliser la notation lilypond&nbsp;:
     a#  => la dièse
     ab  => la bémol
     bb  => si bémol
+
+*Note&nbsp;: Sauf dans les accords.*
+
+**Doubles-altérations**. Les altérations double (double-dièse, double-bémol) doivent impérativement être indiquées par&nbsp;:
+
+    isis    x (double-dièse)
+    eses    bb (double-bémol)
 
 <a name="les_barres_de_mesure"></a>
 ##Écrire les barres de mesure
@@ -443,6 +475,8 @@ Par exemple&nbsp;:
     
     MD << chord("c e g", {:duree => 4, :jeu => PIQUE})
     # => "<c e g>4-."
+
+*Noter que **les altérations**, dans les accords, pour le moment, doivent impérativement se mettre au format Lilypond (is, es, isis, eses).*
 
 Pour les `<options>`, cf. [Options pour les fonctions musicales](#options_fonctions_music)
 

@@ -1,3 +1,4 @@
+# encoding: UTF-8
 =begin
 
 Définition de constantes permettant d'écrire plus facilement.

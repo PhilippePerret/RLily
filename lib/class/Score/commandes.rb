@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class Score
   
   CIRCLE_NOTE = <<-TXT

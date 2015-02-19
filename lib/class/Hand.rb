@@ -1,3 +1,4 @@
+# encoding: UTF-8
 =begin
 
 Class commune aux deux mains
@@ -20,12 +21,11 @@ class Hand
   
   # Corrige les notes (p.e. les "#", "b", etc.)
   def correct_notes note
-    note.gsub!(/([a-g])#/, '\1is')
-    # Les bémols
-    note.gsub!(/[<\( ]([a-g])(b+)/){ $1 + "es" * $2.length}
-    # Les barres
-    note = note.gsub(/ ?\|\|\. ?/, ' \bar "|." ').strip # barre de fin ||.
-    note
+    note.gsub(/([a-g])#/, '\1is')
+      .gsub(/[a-g]x/, '\1isis') # doubles-dièses
+      .gsub(/^([a-g])(b+)/){ $1 + "es" * $2.length} # bémol(s) en première note
+      .gsub(/[<\( ]([a-g])(b+)/){ $1 + "es" * $2.length} # Les bémols
+      .gsub(/ ?\|\|\. ?/, ' \bar "|." ').strip # barre de fin ||.
   end
   
   # Certaines corrections ne peuvent se faire qu'avec le texte complet
@@ -71,6 +71,7 @@ class Hand
   
   # Construction de la staff de la main
   def build
+    return "" if @notes.nil? || @notes.empty?
     <<-STAFF
 \\new Staff {
   #{key_signature}

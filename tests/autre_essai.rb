@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # Définition de la partition
 
 SCORE::titre        = "Extension Hanon - Exercice 61"

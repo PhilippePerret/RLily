@@ -1,3 +1,4 @@
+# encoding: UTF-8
 =begin
 
 Classe pour la main gauche

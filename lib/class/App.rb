@@ -1,3 +1,4 @@
+# encoding: UTF-8
 =begin
 
 Classe de l'application
@@ -10,6 +11,7 @@ class App
     def debug txt, type = :notice
       @debug ||= []
       @debug << {:message => txt, :type => type}
+      log "#{type}: #{txt}"
     end
     
     def show_debug
@@ -38,6 +40,19 @@ class App
     
     def folder_data
       @folder_data ||= File.join(FOLDER_LIB, 'data')
+    end
+    
+    def init_log
+      File.unlink logpath if File.exist? logpath
+    end
+    def log str
+      reflog.write "#{str}\n"
+    end
+    def reflog
+      @reflog ||= File.open(logpath, 'a')
+    end
+    def logpath
+      @logpath ||= File.join(SCORE.folder, 'rlily.log')
     end
     
   end
