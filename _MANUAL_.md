@@ -1,4 +1,4 @@
-# RLily (Ruby to Lilypond)
+#RLily (Ruby to Lilypond)
 
 * [Introduction/Présentation](#introduction)
 * [Écriture du code partition](#write_code_partition)
@@ -26,9 +26,12 @@
 * [Définir l'espacement entre les portées (du piano)](#define_espace_entre_portees)
 * [Définir la taille de la partition (notes/portées)](#define_score_size)
 * [Définir le format de sortie](#define_output_format)
+  * [Sortie comme image PNG](#sortie_comme_image_png)
 * [Réglage des options](#set_options)
   * [Demander l'affichage des dimensions](#option_show_spacing)
   * [Ajouter un slash entre les systèmes](#option_slash_between_systemes)
+
+
 
 
 <a name='introduction'></a>
@@ -331,6 +334,24 @@ Par défaut, le programme produit un PDF de la partition.
 On peut définir de sortir une image PNG plutôt en utilisant&nbsp;:
 
     SCORE::output_format = :png
+    
+
+<a name='sortie_comme_image_png'></a>
+##Sortie comme image PNG
+
+Il est très simple de faire une sortie PNG d'un extrait de partition en définissant&nbsp;:
+
+    # entete du fichier .rlily
+    SCORE::output_format = :png
+
+Si on veut seulement l'image des portées, sans titre, opus ou autre marque de compositeur, utiliser&nbsp;:
+
+    # Entete du fichier .rlily
+    SCORE::output_format  = :png
+    SCORE::no_header      = true
+
+RLily sort alors une simple image PNG des portées en réduisant les blancs autour au maximum.
+
 
 <a name="write_code_partition"></a>
 #Écrire le code de la partition
@@ -373,12 +394,10 @@ Pour les altérations, on peut utiliser la notation lilypond&nbsp;:
     ab  => la bémol
     bb  => si bémol
 
-*Note&nbsp;: Sauf dans les accords.*
+**Altérations doubles**. Les altérations double (double-dièse, double-bémol) se marquent de façon simple par&nbsp;:
 
-**Doubles-altérations**. Les altérations double (double-dièse, double-bémol) doivent impérativement être indiquées par&nbsp;:
-
-    isis    x (double-dièse)
-    eses    bb (double-bémol)
+    x  (double-dièse)       correspond à "isis" dans Lilypond
+    bb (double-bémol)       correspond à "eses" dans Lilypond
 
 <a name="les_barres_de_mesure"></a>
 ##Écrire les barres de mesure
@@ -475,8 +494,6 @@ Par exemple&nbsp;:
     
     MD << chord("c e g", {:duree => 4, :jeu => PIQUE})
     # => "<c e g>4-."
-
-*Noter que **les altérations**, dans les accords, pour le moment, doivent impérativement se mettre au format Lilypond (is, es, isis, eses).*
 
 Pour les `<options>`, cf. [Options pour les fonctions musicales](#options_fonctions_music)
 

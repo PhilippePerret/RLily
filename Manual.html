@@ -322,7 +322,13 @@ sup {
 <li><a href="#write_a_loctave">Écrire un passage à l'octave (8v---)</a></li>
 </ul>
 </li>
-<li><a href="#masquer_element_score">Masquer des éléments de la partition</a></li>
+<li><a href="#masquer_element_score">Masquer des éléments de la partition</a>
+
+<ul>
+<li><a href="#masquer_portee_note_barre_etc">Masquer les barres, les notes, les silences, etc.</a></li>
+<li><a href="#masquer_tout_le_header">Masquer tout l'entête de la partition (titre, etc.)</a></li>
+</ul>
+</li>
 <li><a href="#graphic_elements">Éléments graphiques</a>
 
 <ul>
@@ -340,6 +346,12 @@ sup {
 <li><a href="#define_systeme_spacing">Définir l'espacement entre les systèmes</a></li>
 <li><a href="#define_espace_entre_portees">Définir l'espacement entre les portées (du piano)</a></li>
 <li><a href="#define_score_size">Définir la taille de la partition (notes/portées)</a></li>
+<li><a href="#define_output_format">Définir le format de sortie</a>
+
+<ul>
+<li><a href="#sortie_comme_image_png">Sortie comme image PNG</a></li>
+</ul>
+</li>
 <li><a href="#set_options">Réglage des options</a>
 
 <ul>
@@ -371,7 +383,7 @@ sup {
 <h2>Quick référence pour la création</h2>
 
 <ol>
-<li>Créer le fichier RLily (.rlily) qui va contenir le code pour la partition (c'est le "fichier source")</li>
+<li>Créer le fichier RLily (<code>.rlily</code>) qui va contenir le code pour la partition (c'est le "fichier source")</li>
 <li>Définir les données du score (<a href="#donnees_generales">Données générales du score</a>)</li>
 <li>Définir le contenu de chaque main avec <code>MD &lt;&lt; "&lt;notes&gt;"</code> et <code>MG &lt;&lt; "&lt;notes&gt;"</code></li>
 </ol>
@@ -439,13 +451,17 @@ $ sudo chmod u+x rlily
 
 <h1>Masquer des éléments de la partition</h1>
 
+<p><a name='masquer_portee_note_barre_etc'></a></p>
+
+<h2>Masquer les barres, les notes, les silences, etc.</h2>
+
 <p>On peut utiliser la pseudo-commande <code>hide(&lt;element&gt;)</code> (cacher) pour masquer des éléments de la partition, barres de mesures, hampes, etc.</p>
 
-<p><code>&lt;element&gt;</code> peut être&nbsp;:</p>
+<p><code>&lt;element&gt;</code> peut être (voir plus bas toutes les valeurs possibles)&nbsp;:</p>
 
-<pre><code>Un Symbole              :beam
+<pre><code>Tous                    :all          Tout est masqué
+Un Symbole              :beam
 Une liste de symboles   [:beam, :staff]
-Le symbole spécial      :all
 </code></pre>
 
 <p>Quand <code>:all</code> est envoyé à <code>hide</code>, peut définir les éléments qui ne doivent pas être masqués à l'aide d'un second argument&nbsp;:</p>
@@ -497,6 +513,17 @@ Crochets                :beam / :crochet      hide(:beam)
 Métrique                :metrique             hide(:metrique)
 Clé                     :clef / :key          hide(:clef)
 ----------------------------------------------------------------
+</code></pre>
+
+<p><a name='masquer_tout_le_header'></a></p>
+
+<h2>Masquer tout l'entête de la partition (titre, etc.)</h2>
+
+<p>Pour les images (<code>Score::output_format = :png</code>), il peut être utile de supprimer tout entête, titre, opus, etc. si c'est juste un extrait de partition qu'on veut afficher.</p>
+
+<p>On peut supprimer facilement tout entête en indiquant en haut du fichier RLily&nbsp;:</p>
+
+<pre><code>Score::no_header = true
 </code></pre>
 
 <p><a name='graphic_elements'></a></p>
@@ -683,6 +710,36 @@ LIVRE_CHANT / 18          Les livres de chant
 23 et 26
 </code></pre>
 
+<p><a name='define_output_format'></a></p>
+
+<h2>Définir le format de sortie</h2>
+
+<p>Par défaut, le programme produit un PDF de la partition.</p>
+
+<p>On peut définir de sortir une image PNG plutôt en utilisant&nbsp;:</p>
+
+<pre><code>SCORE::output_format = :png
+</code></pre>
+
+<p><a name='sortie_comme_image_png'></a></p>
+
+<h2>Sortie comme image PNG</h2>
+
+<p>Il est très simple de faire une sortie PNG d'un extrait de partition en définissant&nbsp;:</p>
+
+<pre><code># entete du fichier .rlily
+SCORE::output_format = :png
+</code></pre>
+
+<p>Si on veut seulement l'image des portées, sans titre, opus ou autre marque de compositeur, utiliser&nbsp;:</p>
+
+<pre><code># Entete du fichier .rlily
+SCORE::output_format  = :png
+SCORE::no_header      = true
+</code></pre>
+
+<p>RLily sort alors une simple image PNG des portées en réduisant les blancs autour au maximum.</p>
+
 <p><a name="write_code_partition"></a></p>
 
 <h1>Écrire le code de la partition</h1>
@@ -728,6 +785,12 @@ aes =&gt; la bémol
 <pre><code>a#  =&gt; la dièse
 ab  =&gt; la bémol
 bb  =&gt; si bémol
+</code></pre>
+
+<p><strong>Altérations doubles</strong>. Les altérations double (double-dièse, double-bémol) se marquent de façon simple par&nbsp;:</p>
+
+<pre><code>x  (double-dièse)       correspond à "isis" dans Lilypond
+bb (double-bémol)       correspond à "eses" dans Lilypond
 </code></pre>
 
 <p><a name="les_barres_de_mesure"></a></p>
