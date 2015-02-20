@@ -22,7 +22,7 @@ class Hand
   # Corrige les notes (p.e. les "#", "b", etc.)
   def correct_notes note
     note.gsub(/([a-g])#/, '\1is')
-      .gsub(/([a-g])x/, '\1isis') # doubles-dièses
+      .gsub(/(\b[a-g])x/, '\1isis') # doubles-dièses
       .gsub(/^([a-g])(b+)/){ $1 + "es" * $2.length} # bémol(s) en première note
       .gsub(/([<\( ][a-g])(b+)/){ $1 + "es" * $2.length} # Les bémols
       .gsub(/ ?\|\|\. ?/, ' \bar "|." ').strip # barre de fin ||.

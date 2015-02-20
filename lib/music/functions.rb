@@ -174,13 +174,19 @@ def mark notes, str, options = nil
     "\n\\once \\override Score.RehearsalMark.self-alignment-X = #RIGHT\n"+
     "\\mark \"#{str}\"\n"
   else
-    notes = notes.split(' ')
-    nombre_notes = notes.count
-    nb_moitie = (nombre_notes / 2) - 1
-    nb_reste  = (nombre_notes - nb_moitie) + 2
-    notes_avant = notes[0..nb_moitie].join(' ')
-    notes_apres = notes[(nb_moitie+1)..(nombre_notes-1)].join(' ')
-    
-    "#{notes_avant} \\mark \"#{str}\" #{notes_apres}"
+    if notes.index(' ')
+      notes = notes.split(' ')
+      nombre_notes = notes.count
+      nb_moitie = (nombre_notes / 2) - 1
+      nb_reste  = (nombre_notes - nb_moitie) + 2
+      notes_avant = notes[0..nb_moitie].join(' ')
+      notes_apres = notes[(nb_moitie+1)..(nombre_notes-1)].join(' ')
+      notes_apres = " #{notes_apres}"
+      notes_avant.concat(' ')
+    else
+      notes_avant = notes.concat(' ')
+      notes_apres = ""
+    end
+    "#{notes_avant}\\mark \"#{str}\"#{notes_apres}"
   end
 end
