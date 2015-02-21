@@ -137,7 +137,17 @@ class Score
   #
   def output_as_pdf
     begin
+      
+      ##
+      ## COMMANDE POUR UTILISATION LOCALE DE L'APPLICATION
+      ##
       cmd = "cd \"#{folder}\";echo \"#{App::su_password}\" | sudo -S lilypond \"#{lilypond_filepath}\" 2>&1"
+      
+      ##
+      ## COMMANDE POUR UTILISATION DANS LES XEXTRA DE L'ATELIER ICARE
+      ##
+      # cmd = "cd \"#{folder}\";/home/icare/bin/lilypond \"#{lilypond_filepath}\" 2>&1"
+      
       dbg "Commande lilypond : #{cmd}", :notice
       `#{cmd}`
     rescue Exception => e
@@ -165,9 +175,19 @@ class Score
   #
   def output_as_png
     begin
-      # Commande spéciale pour les png
+      
+      ##
+      ## COMMANDE POUR UTILISATION LOCALE DE L'APPLICATION
+      ##
       cmdllp = "lilypond -dbackend=eps -dno-gs-load-fonts -dinclude-eps-fonts -dpixmap-format=pngalpha --png \"#{lilypond_filepath}\""
       cmd = "cd \"#{folder}\";echo \"#{App::su_password}\" | sudo -S #{cmdllp} 2>&1"
+
+      ##
+      ## COMMANDE POUR UTILISATION SUR L'ATELIER ICARE (XEXTRA)
+      ##
+      # cmd = "cd \"#{folder}\";/home/icare/bin/lilypond -dbackend=eps -dno-gs-load-fonts -dinclude-eps-fonts -dpixmap-format=pngalpha --png \"#{File.basename lilypond_filepath}\" 2>&1"
+
+
       dbg "Commande lilypond : #{cmd}", :notice
       `#{cmd}`
     rescue Exception => e

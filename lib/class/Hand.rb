@@ -18,50 +18,7 @@ class Hand
   # Ajoute quelque chose à la main
   def << note; notes << correct_notes(note) end
   
-  
-  # Corrige les notes (p.e. les "#", "b", etc.)
-  def correct_notes note
-    note.gsub(/([a-g])#/, '\1is')
-      .gsub(/(\b[a-g])x/, '\1isis') # doubles-dièses
-      .gsub(/^([a-g])(b+)/){ $1 + "es" * $2.length} # bémol(s) en première note
-      .gsub(/([<\( ][a-g])(b+)/){ $1 + "es" * $2.length} # Les bémols
-      .gsub(/ ?\|\|\. ?/, ' \bar "|." ').strip # barre de fin ||.
-  end
-  
-  # Certaines corrections ne peuvent se faire qu'avec le texte complet
-  # D'autres part, les notes ({Array} pour le moment) sont rassemblées pour
-  # composer un string
-  REG_REPRISE = /\|\:(.*?)\|1(.*?)\:\|2(.*?)\|\|/
-  def correct_final_notes
-=begin
-\repeat volta 2 { c4 d e f | }
-\alternative {
-  { c2 e | }
-  { f2 g | }
-}
-=end
-    final = notes.join(" ")
-    if final.index("|1")
-      final.gsub!(REG_REPRISE){
-        volta = $1
-        alte1 = $2
-        alte2 = $3
-        "\\repeat volta 2 { #{volta.strip} } " +
-        "\\alternative { { #{alte1.strip} }" + "{ #{alte2.strip} } }"
-      }
-    end
-    # Double barre de reprise (ouverture)
-    final = final.gsub(/ ?\:\|?\|\: ?/, ' DOUBLE_BARRE_REPRISE ').strip
-    # Double barres
-    final = final.gsub(/ ?\|\| ?/, ' \bar "||" ').strip  # double barre
-    final = final.gsub(/ ?\|\: ?/, ' \bar ".|:" ').strip # barre de reprise (ouverture)
-    final = final.gsub(/ ?\:\| ?/, ' \bar ":|." ').strip # barre de reprise (fermeture)
-    
-    final = final.gsub(/DOUBLE_BARRE_REPRISE/, ' \bar ":|.|:" ')
-    
-    return final
-  end
-  
+ 
   # Initialise la liste des notes ou autres marques
   def notes;  @notes ||= []   end
   # Ré-initialise la liste des notes
