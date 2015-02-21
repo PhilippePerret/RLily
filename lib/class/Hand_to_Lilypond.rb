@@ -94,9 +94,19 @@ class Hand
     # Méthode principale traitant les notes de l'instance
     #
     def treate
+      nettoyer_notes
       traite_alterations
       corrige_textes_speciaux
       return notes
+    end
+    
+    ##
+    #
+    # Premier travail de préparation des notes, pour retirer
+    # les retours chariots et autres double espaces
+    #
+    def nettoyer_notes
+      @notes = @notes.gsub(/[\n\r]/, ' ').gsub(/  +/, ' ').strip
     end
     
     ##
@@ -121,9 +131,12 @@ class Hand
       ##
       ## Textes dans un cercle, une boite
       ##
-      @notes.gsub!(/([ob])\{(.*?)\}/){
+      lengthOn = false
+      @notes.gsub!(/(o|b)\{(.*?)\}(\1)?/){
         type  = $1
         texte = $2
+        fin   = $3
+        lengthOn = true if fin == type
         forme = case type
         when "o" then "circle"
         when "b" then "box"
@@ -131,6 +144,44 @@ class Hand
         end
         "\\markup { \\#{forme} \\pad-around #0.5 { \"#{texte}\" } }"
       }
+      
+      ##
+      ## Modulation (mod)
+      ##
+      @notes.gsub!(/(ton|mod)\{(.*?)\}(\1)?/){
+        type = $1
+        text = $2
+        fin  = $3
+        lengthOn = true if fin == type
+        "\\markup { \\rotate #30 \\box \\pad-around #0.5 { \"#{text}\" } }"
+      }
+
+      ##
+      ## Emprunt (emp)
+      ##
+      @notes.gsub!(/emp\{(.*?)\}(emp)?/){
+        text = $1
+        fin  = $2
+        lengthOn = true if fin == 'emp'
+        "\\markup { " +
+          " \\override #'(thickness . 2) " +
+          " \\hspace #-3 " +
+          " \\draw-line #'( 0 . 4 ) " +
+          " \\raise #4 " +
+          " \\rotate #33 " +
+          " \\line { #{text}-> }" +
+          " }"
+      }
+      
+      ##
+      ## Traitement des 2xX => \repeat percent 2
+      ##
+      @notes = " #{@notes}"
+      @notes.gsub!(/ ([0-9]{1,2})xX([ \{])/){ " \\repeat percent #{$1} #{$2}"}
+      @notes = @notes.strip
+      
+
+      @notes = "\\textLengthOn #{notes} \\textLengthOff" if lengthOn
     end
   end
 end
