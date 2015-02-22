@@ -27,6 +27,7 @@
 * [Définir la taille de la partition (notes/portées)](#define_score_size)
 * [Définir le format de sortie](#define_output_format)
   * [Sortie comme image PNG](#sortie_comme_image_png)
+  * [Définition la résolution de la sortie](#define_score_resolution)
 * [Réglage des options](#set_options)
   * [Demander l'affichage des dimensions](#option_show_spacing)
   * [Ajouter un slash entre les systèmes](#option_slash_between_systemes)
@@ -325,33 +326,6 @@ Où `<valeur>` peut être&nbsp;:
     13, 14, 16
     LIVRE_CHANT / 18          Les livres de chant
     23 et 26
-    
-<a name='define_output_format'></a>
-##Définir le format de sortie
-
-Par défaut, le programme produit un PDF de la partition.
-
-On peut définir de sortir une image PNG plutôt en utilisant&nbsp;:
-
-    SCORE::output_format = :png
-    
-
-<a name='sortie_comme_image_png'></a>
-##Sortie comme image PNG
-
-Il est très simple de faire une sortie PNG d'un extrait de partition en définissant&nbsp;:
-
-    # entete du fichier .rlily
-    SCORE::output_format = :png
-
-Si on veut seulement l'image des portées, sans titre, opus ou autre marque de compositeur, utiliser&nbsp;:
-
-    # Entete du fichier .rlily
-    SCORE::output_format  = :png
-    SCORE::no_header      = true
-
-RLily sort alors une simple image PNG des portées en réduisant les blancs autour au maximum.
-
 
 <a name="write_code_partition"></a>
 #Écrire le code de la partition
@@ -526,6 +500,41 @@ Par exemple&nbsp;:
     MD << octave("c''' e f g", 2)
     # => Ecrit les notes une octave en dessous, avec la marque "15ma-----"
     
+
+
+<a name='define_output_format'></a>
+##Définir le format de sortie
+
+Par défaut, le programme produit un PDF de la partition.
+
+On peut définir de sortir une image PNG plutôt en utilisant&nbsp;:
+
+    SCORE::output_format = :png
+    
+
+<a name='sortie_comme_image_png'></a>
+##Sortie comme image PNG
+
+Il est très simple de faire une sortie PNG d'un extrait de partition en définissant&nbsp;:
+
+    # entete du fichier .rlily
+    SCORE::output_format = :png
+
+Si on veut seulement l'image des portées, sans titre, opus ou autre marque de compositeur, utiliser&nbsp;:
+
+    # Entete du fichier .rlily
+    SCORE::output_format  = :png
+    SCORE::no_header      = true
+
+RLily sort alors une simple image PNG des portées en réduisant les blancs autour au maximum.
+
+
+<a name='define_score_resolution'></a>
+###Définition la résolution de la sortie
+
+Pour définir la résolution, utiliser&nbsp;:
+
+    SCORE::resolution   =  <valeur>
 
 <a name="set_options"></a>
 ##Réglage des options
