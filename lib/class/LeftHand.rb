@@ -4,6 +4,7 @@
 Classe pour la main gauche
 
 =end
+require_relative 'Hand'
 class LeftHand < Hand
 
   def relative

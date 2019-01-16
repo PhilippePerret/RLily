@@ -12,7 +12,7 @@ system-system-spacing = #'(
   (minimum-distance . #{system_spacing_min})
 	(padding          . #{system_spacing_pad})
   (stretchability   . 10)
-) 
+)
 ragged-bottom = ##t % Si False (##f), les portées se répartissent sur la feuille
 ragged-bottom-last = ##t
 #  où #{system_spacing} doit être un nombre (p.e. 10)
@@ -20,30 +20,30 @@ ragged-bottom-last = ##t
 Code pour régler la distance entre le titre et le premier système
 
 markup-system-spacing = #'(
-	(basic-distance   . 20) 
+	(basic-distance   . 20)
   (minimum-distance . #{system_spacing_min})
 	(padding . 0)
 	(stretchability . 0)
 
-) 
+)
 
 
 
 =end
 class Score
-  
+
   # Le fichier source contenant le code user
   attr_reader :source
-  
+
   # Le code lilypond final produit
   attr_reader :code_final
-  
+
   # Les systèmes créés (en général un seul, double)
   attr_accessor :staves
-  
+
   # Données à définir à l'aide de SCORE::<donnée>
   attr_accessor :verbose # defaut : nil
-  
+
   attr_accessor :no_header
   attr_accessor :titre
   attr_accessor :sous_titre
@@ -60,14 +60,14 @@ class Score
   # Espaces
   attr_accessor :espace_titre_systemes  # entre le titre et le 1er système
   attr_accessor :espace_entre_systemes  # entre les systèmes
-  
-  
+
+
   # Taille de la partition (20 pour normal)
   attr_accessor :taille
-  
+
   # Distance de la marge top au titre
   attr_accessor :top_spacing
-  
+
 #   <<-LP
 # top-markup-spacing = #'(
 #   (padding . 1)
@@ -76,7 +76,7 @@ class Score
 #   (stretchability . 0) % pour empêcher l'étirement automatique
 # )
 #   LP
-  
+
   # Options True ou False
   OPTIONS = {
     # Affiche les dimensions sur la partition
@@ -91,7 +91,7 @@ class Score
     # Slash ("//") entre les systèmes : \\slashSeparator
     :slash_between_systemes => {:command => "system-separator-markup", :value => nil}
   }
-  
+
   # Retourne ou définit l'option +key+
   def option key, value = nil
     if key.class == Hash
@@ -108,42 +108,48 @@ class Score
       raise "Clé #{key} inconnue des options du score"
     end
   end
-  
+
   # Construction de la partition
   def build
+    puts "---> erase_old_files" if verbose
     erase_old_files
+    puts "---> load_source" if verbose
     load_source
+    puts "---> compose" if verbose
     compose
+    puts "---> save_lilypond_file" if verbose
     save_lilypond_file
-        
+
     # Production du PDF ou du PNG
     res = case output_format
     when :pdf, nil
+      puts "---> output_as_pdf" if verbose
       output_as_pdf
     when :png
+      puts "---> output_as_png" if verbose
       output_as_png
     else
-      dbg "Format de sortie inconnu (#{output_format}). Je sors en pdf"
+      puts "Format de sortie inconnu (#{output_format}). Je sors en pdf"  if verbose
       output_as_pdf
     end
-    
+
     if res === false || verbose
       App::show_debug
     end
   end
-    
+
   # Chargement du code source
   def load_source
     load source
   end
-  
+
   # Composition du code final
   def compose
     # On demande d'abord de construire le code des portées pour pouvoir
     # détecter les commandes-raccourcis qu'il faudra ajouter, par exemple
     # la variable \circle
     bloc_score
-    
+
     @code_final = []
     @code_final << definitions_preliminaires
     @code_final << paper_definition
@@ -153,7 +159,7 @@ class Score
     @code_final << bloc_score
     @code_final = @code_final.join("\n")
   end
-  
+
   def definitions_preliminaires
     mark_score_size
     mark_score_resolution
@@ -169,12 +175,12 @@ class Score
     LP
     end
   end
-  
+
   # On sauve le fichier Lilypond produit
   def save_lilypond_file
     File.open(lilypond_filepath, 'wb'){|f| f.write @code_final}
   end
-  
+
   # Construction des portées
   def staves
     # On met toujours le système courant en mémoire
@@ -182,13 +188,13 @@ class Score
     # On renvoie tous les systèmes
     @staves.join("\n\n")
   end
-  
+
   # Mémorisation du système courant
   def memorize_stave
     @staves ||= []
     @staves << stave
   end
-  
+
   # Retourne le code pour le système courant
   def stave
     <<-LP
@@ -203,14 +209,14 @@ class Score
 >>
     LP
   end
-  
+
   def espace_entre_portees
     @espace_entre_portees ||= 3
   end
   def espace_entre_portees= value
     @espace_entre_portees = value
   end
-  
+
   # Entête du fichier lilypond
   def lp_header
     <<-HEAD
@@ -221,7 +227,7 @@ class Score
 
     HEAD
   end
-  
+
   REQUIRED_COMMANDES_RACCOURCIS = {
     :circle_note => false
   }
@@ -233,7 +239,7 @@ class Score
     end
     str.join("\n")
   end
-  
+
   # Entête header du fichier lilypond
   def header
     <<-HEADER
@@ -248,7 +254,7 @@ class Score
 
     HEADER
   end
-  
+
   def mark_subtitle
     return "" if sous_titre.nil?
     "subtitle = \"#{sous_titre}\""
@@ -261,7 +267,7 @@ class Score
     return "" if val.nil?
     "#{prop} = \"#{avant}#{val}\""
   end
-  
+
   #
   def mark_score_size
     return "" if taille.nil?
@@ -278,11 +284,11 @@ class Score
     File.unlink pdf_filepath if File.exists? pdf_filepath
     App::init_log
   end
-  
+
   # ---------------------------------------------------------------------
   #   Pathes
   # ---------------------------------------------------------------------
-  
+
   # Affixe des fichiers produit
   def affixe
     @affixe ||= File.basename(source, File.extname(source))
@@ -291,28 +297,28 @@ class Score
   def folder
     @folder ||= File.dirname(source)
   end
-  
+
   def lilypond_filepath
     @lilypond_filepath ||= File.join(folder, "#{affixe}.ly")
   end
-  
+
   def pdf_filepath
     @pdf_filepath ||= File.join(folder, "#{affixe}.pdf")
   end
   def png_filepath
     @png_filepath ||= File.join(folder, "#{affixe}.png")
   end
-  
+
   # Définition du fichier source
   def source= path
     path = "#{path}.rlily" unless path.end_with?(".rlily")
     raise "Fichier introuvable (#{path})" unless File.exists? path
     @source = path
   end
-  
-  
-  
-  
-  
+
+
+
+
+
 end
 SCORE = Score::new

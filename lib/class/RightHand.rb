@@ -4,6 +4,7 @@ Classe pour la main droite
 class RightHand < Hand
 
 =end
+require_relative 'Hand'
 class RightHand < Hand
 
   def relative
@@ -15,7 +16,7 @@ class RightHand < Hand
   def fingering_direction
     "#UP"
   end
-  
+
 end
 MD = RightHand::new
 RH = MD
